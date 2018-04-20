@@ -607,7 +607,7 @@ multiplyFraccion: aFraccionToMultiply
 
 !classDefinition: #EnteroDistintoDeCeroYUno category: #'Numero-Exercise'!
 Entero subclass: #EnteroDistintoDeCeroYUno
-	instanceVariableNames: 'value'
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
