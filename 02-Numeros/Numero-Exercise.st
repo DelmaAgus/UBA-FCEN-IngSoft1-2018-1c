@@ -573,10 +573,10 @@ addFraccion: aFraccionToAdd
 
 	^ aFraccionToAdd addUno: self.! !
 
-!Uno methodsFor: 'double dispatch' stamp: 'AD 4/20/2018 09:58:09'!
+!Uno methodsFor: 'double dispatch' stamp: 'AD 4/20/2018 10:53:45'!
 addUno: anUnoToAdd
 
-	^ Entero with: 2.! !
+	^ super class with: 2.! !
 
 !Uno methodsFor: 'double dispatch' stamp: 'AD 4/20/2018 09:31:40'!
 divideCero: aCeroToDivide
