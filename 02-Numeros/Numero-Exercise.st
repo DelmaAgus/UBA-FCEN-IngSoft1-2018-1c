@@ -40,9 +40,9 @@ test07EnteroDividesEnteroCorrectly
 
 	self assert: two / two equals: one! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 20:38'!
+!NumeroTest methodsFor: 'tests' stamp: 'AD 4/19/2018 21:22:55'!
 test08FraccionAddsWithFraccionCorrectly
-"
+	"
     La suma de fracciones es:
 	 
 	a/b + c/d = (a.d + c.b) / (b.d)
@@ -51,10 +51,10 @@ test08FraccionAddsWithFraccionCorrectly
 	TODAVIA NO SE ESTA TESTEANDO ESE CASO
 "
 	| sevenTenths |
-
-	sevenTenths := (Entero with: 7) / (Entero with: 10).
-
-	self assert: oneFifth + oneHalf equals: sevenTenths! !
+	sevenTenths _ (Entero with: 7) / (Entero with: 10).
+	self
+		assert: oneFifth + oneHalf
+		equals: sevenTenths.! !
 
 !NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 20:52'!
 test09FraccionMultipliesWithFraccionCorrectly
@@ -76,18 +76,20 @@ test10FraccionDividesFraccionCorrectly
 
 	self assert: oneHalf / oneFifth equals: fiveHalfs! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 21:07'!
+!NumeroTest methodsFor: 'tests' stamp: 'AD 4/19/2018 21:22:55'!
 test11EnteroAddsFraccionCorrectly
-"
+	"
 	Ahora empieza la diversion!!
 "
+	self
+		assert: one + oneFifth
+		equals: (Entero with: 6) / (Entero with: 5).! !
 
-	self assert: one + oneFifth equals: (Entero with: 6) / (Entero with: 5)! !
-
-!NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 21:07'!
+!NumeroTest methodsFor: 'tests' stamp: 'AD 4/19/2018 21:22:55'!
 test12FraccionAddsEnteroCorrectly
-
-	self assert: oneFifth + one equals: (Entero with: 6) / (Entero with: 5)! !
+	self
+		assert: oneFifth + one
+		equals: (Entero with: 6) / (Entero with: 5).! !
 
 !NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 21:50'!
 test13EnteroMultipliesFraccionCorrectly
@@ -168,21 +170,18 @@ test26AFraccionCanNotBeOne
 	self deny: oneHalf isOne! !
 
 
-!NumeroTest methodsFor: 'setup' stamp: 'HernanWilkinson 5/7/2016 20:56'!
+!NumeroTest methodsFor: 'setup' stamp: 'AD 4/19/2018 21:22:55'!
 setUp
-
-	zero := Entero with: 0.
-	one := Entero with: 1.
-	two := Entero with: 2.
-	four := Entero with: 4.
-	five := Entero with: 5.
-	
-	oneHalf := one / two.
-	oneFifth := one / five.
-	twoFifth := two / five.
-	twoTwentyfifth := two / (Entero with: 25).
-	fiveHalfs := five / two.
-	! !
+	zero _ Entero with: 0.
+	one _ Entero with: 1.
+	two _ Entero with: 2.
+	four _ Entero with: 4.
+	five _ Entero with: 5.
+	oneHalf _ one / two.
+	oneFifth _ one / five.
+	twoFifth _ two / five.
+	twoTwentyfifth _ two / (Entero with: 25).
+	fiveHalfs _ five / two.! !
 
 
 !classDefinition: #Numero category: #'Numero-Exercise'!
@@ -223,6 +222,48 @@ isZero
 
 	self subclassResponsibility ! !
 
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 21:44:00'!
+addCero
+
+	^ self! !
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 20:24:21'!
+addEntero: unSumandoEntero
+	self subclassResponsibility.! !
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 20:25:16'!
+addFraccion: unSumandoFraccional
+	self subclassResponsibility.! !
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 21:41:55'!
+addUno
+
+	self subclassResponsibility.! !
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 21:04:44'!
+divideCero
+
+	self subclassResponsibility.! !
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 20:27:46'!
+divideEntero: unDIvidendoEntero
+	self subclassResponsibility.! !
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 20:28:21'!
+divideFraccion: unDividendoFraccional
+	self subclassResponsibility.! !
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 20:32:35'!
+multiplyEntero: anEnteroToMultiply
+
+	self subclassResponsibility.! !
+
+!Numero methodsFor: 'double dispatch' stamp: 'AD 4/19/2018 20:32:11'!
+multiplyFraccion: aFraccionToMultiply
+
+	self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Numero class' category: #'Numero-Exercise'!
@@ -237,6 +278,76 @@ canNotDivideByZeroErrorDescription
 !Numero class methodsFor: 'error descriptions' stamp: 'HernanWilkinson 5/7/2016 22:47'!
 invalidNumberTypeErrorDescription
 	^ 'Tipo de numero invalido'! !
+
+
+!classDefinition: #Cero category: #'Numero-Exercise'!
+Entero subclass: #Cero
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:58:46'!
+* aMultiplier
+
+	^ self! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:01:04'!
++ anAdder
+
+	^ anAdder! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:00:17'!
+/ aDivisor
+
+	^ aDivisor divideCero.! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:58:06'!
+addEntero: anEnteroToAdd
+
+	^ anEnteroToAdd ! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:57:17'!
+addFraccion: aFraccionToAdd
+
+	^ aFraccionToAdd ! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:03:06'!
+divideCero
+
+	self class canNotDivideByZeroErrorDescription
+
+	! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:56:02'!
+divideEntero: anEnteroToDivide
+
+	self class canNotDivideByZeroErrorDescription! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:56:24'!
+divideFraccion: aFraccionToDivide
+
+	self class canNotDivideByZeroErrorDescription! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:04:14'!
+isOne
+
+	^ false! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:04:03'!
+isZero
+
+	^ true! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:02:04'!
+multiplyEntero: anEnteroToMultiply
+
+	^ self! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:02:18'!
+multiplyFraccion: aFraccionToMultiply
+
+	^ self! !
 
 
 !classDefinition: #Entero category: #'Numero-Exercise'!
@@ -282,70 +393,61 @@ initalizeWith: aValue
 	value := aValue! !
 
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:14:22'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:26:06'!
 * aMultiplier
+	^ aMultiplier multiplyEntero: self.! !
 
-	^aMultiplier multiplicarPorEntero: self
-	! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:24:21'!
++ anAdder
+	^ anAdder addEntero: self.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:30:11'!
-+ anAdder 
-	
-	^anAdder sumarEntero: self
-! !
-
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:56:00'!
-/ aDivisor 
-	
-	^aDivisor divideAUnEntero: self! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:27:46'!
+/ aDivisor
+	^ aDivisor divideEntero: self.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:55'!
 // aDivisor 
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:47:49'!
-divideAUnEntero: unDividendoEntero 
-	
-		^Fraccion with: unDividendoEntero over: self
-! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:24:21'!
+addEntero: unSumandoEntero
+	^ self class with: value + unSumandoEntero integerValue.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:51:15'!
-divideAUnaFraccion: unDividendoFraccional 
-	
-	^(unDividendoFraccional numerator ) / (self * unDividendoFraccional denominator) 
-	! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:25:16'!
+addFraccion: unSumandoFraccional
+	^ self * unSumandoFraccional denominator + unSumandoFraccional numerator / unSumandoFraccional denominator.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:05:27'!
+divideCero
+
+	^ Cero new.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:46:57'!
+divideEntero: unDividendoEntero
+
+	^ Fraccion
+		with: unDividendoEntero
+		over: self.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:28:21'!
+divideFraccion: unDividendoFraccional
+	^ unDividendoFraccional numerator / (self * unDividendoFraccional denominator).! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:48:33'!
 greatestCommonDivisorWith: anEntero 
 	
-	^self class with: (value gcd: anEntero integerValue)! !
+	^ self subclassResponsibility ! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:10:51'!
-multiplicarPorEntero: unMultiplicadorEntero 
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:32:54'!
+multiplyEntero: anEnteroToMultiply
 
-	^self class with: value * unMultiplicadorEntero integerValue
+	^ self class with: value * anEnteroToMultiply integerValue.! !
 
-	! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:31:54'!
+multiplyFraccion: aFraccionToMultiply
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:11:54'!
-multiplicarPorFraccion: unMultiplicadorFraccional 
-
-	^ (self * unMultiplicadorFraccional numerator) / (unMultiplicadorFraccional denominator)
-	! !
-
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:24:53'!
-sumarEntero: unSumandoEntero 
-	
-		^self class with: value + unSumandoEntero integerValue
-! !
-
-!Entero methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:29:24'!
-sumarFraccion: unSumandoFraccional 
-	
-	^ (self * unSumandoFraccional denominator + unSumandoFraccional numerator) / (unSumandoFraccional denominator)
-	
-! !
+	^ self * aFraccionToMultiply numerator / aFraccionToMultiply denominator.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -353,13 +455,271 @@ sumarFraccion: unSumandoFraccional
 Entero class
 	instanceVariableNames: ''!
 
-!Entero class methodsFor: 'instance creation' stamp: 'HernanWilkinson 5/7/2016 22:53'!
+!Entero class methodsFor: 'instance creation' stamp: 'AD 4/19/2018 21:45:45'!
 with: aValue 
 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
 	
-	^self new initalizeWith: aValue! !
+	aValue isZero ifTrue: [^ Cero new].
+	aValue isOne ifTrue: [^ Uno new].
+	
+	^ EnteroDistintoDeCeroYUno new initalizeWith: aValue! !
+
+
+!classDefinition: #Cero category: #'Numero-Exercise'!
+Entero subclass: #Cero
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:58:46'!
+* aMultiplier
+
+	^ self! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:01:04'!
++ anAdder
+
+	^ anAdder! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:00:17'!
+/ aDivisor
+
+	^ aDivisor divideCero.! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:58:06'!
+addEntero: anEnteroToAdd
+
+	^ anEnteroToAdd ! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:57:17'!
+addFraccion: aFraccionToAdd
+
+	^ aFraccionToAdd ! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:03:06'!
+divideCero
+
+	self class canNotDivideByZeroErrorDescription
+
+	! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:56:02'!
+divideEntero: anEnteroToDivide
+
+	self class canNotDivideByZeroErrorDescription! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 20:56:24'!
+divideFraccion: aFraccionToDivide
+
+	self class canNotDivideByZeroErrorDescription! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:04:14'!
+isOne
+
+	^ false! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:04:03'!
+isZero
+
+	^ true! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:02:04'!
+multiplyEntero: anEnteroToMultiply
+
+	^ self! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:02:18'!
+multiplyFraccion: aFraccionToMultiply
+
+	^ self! !
+
+
+!classDefinition: #Uno category: #'Numero-Exercise'!
+Entero subclass: #Uno
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:33:36'!
+* aMultiplier
+
+	^ aMultiplier! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:34:03'!
++ anAdder
+
+	anAdder addUno.! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:34:32'!
+/ aDivisor
+
+	^ aDivisor divideUno.! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:37:13'!
+addEntero: anEnteroToAdd
+
+	^ anEnteroToAdd addUno.! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:38:03'!
+addFraccion: aFraccionToAdd
+
+	^ aFraccionToAdd addUno.! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:43:11'!
+addUno
+
+	^ Entero with: 2.! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:40:08'!
+divideEntero: anEnteroToDivide
+
+	^ anEnteroToDivide ! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:40:21'!
+divideFraccion: aFraccionToDivide
+
+	^ aFraccionToDivide ! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:40:30'!
+isOne
+
+	^ true! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:40:36'!
+isZero
+
+	^ false! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:40:52'!
+multiplyEntero: anEnteroToMultiply
+
+	^ anEnteroToMultiply ! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'AD 4/19/2018 21:41:11'!
+multiplyFraccion: aFraccionToMultiply
+
+	^ aFraccionToMultiply ! !
+
+
+!classDefinition: #EnteroDistintoDeCeroYUno category: #'Numero-Exercise'!
+Entero subclass: #EnteroDistintoDeCeroYUno
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!EnteroDistintoDeCeroYUno methodsFor: 'value' stamp: 'AD 4/19/2018 21:46:49'!
+integerValue
+
+	"Usamos integerValue en vez de value para que no haya problemas con el mensaje value implementado en Object - Hernan"
+	
+	^value! !
+
+
+!EnteroDistintoDeCeroYUno methodsFor: 'testing' stamp: 'AD 4/19/2018 21:46:49'!
+isOne
+	
+	^value = 1! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'testing' stamp: 'AD 4/19/2018 21:46:49'!
+isZero
+	
+	^value = 0! !
+
+
+!EnteroDistintoDeCeroYUno methodsFor: 'comparing' stamp: 'AD 4/19/2018 21:46:49'!
+= anObject
+
+	^(anObject isKindOf: self class) and: [ value = anObject integerValue ]! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'comparing' stamp: 'AD 4/19/2018 21:46:49'!
+hash
+
+	^value hash! !
+
+
+!EnteroDistintoDeCeroYUno methodsFor: 'initialization' stamp: 'AD 4/19/2018 21:46:49'!
+initalizeWith: aValue 
+	
+	value := aValue! !
+
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+* aMultiplier
+	^ aMultiplier multiplyEntero: self.! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
++ anAdder
+	^ anAdder addEntero: self.! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+/ aDivisor
+	^ aDivisor divideEntero: self.! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+// aDivisor 
+	
+	^self class with: value // aDivisor integerValue! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+addEntero: unSumandoEntero
+	^ self class with: value + unSumandoEntero integerValue.! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+addFraccion: unSumandoFraccional
+	^ self * unSumandoFraccional denominator + unSumandoFraccional numerator / unSumandoFraccional denominator.! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+divideCero
+
+	^ Cero new.! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+divideEntero: unDividendoEntero
+
+	^ Fraccion
+		with: unDividendoEntero
+		over: self.! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+divideFraccion: unDividendoFraccional
+	^ unDividendoFraccional numerator / (self * unDividendoFraccional denominator).! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+greatestCommonDivisorWith: anEntero 
+	
+	^self class with: (value gcd: anEntero integerValue)! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+multiplyEntero: anEnteroToMultiply
+
+	^ self class with: value * anEnteroToMultiply integerValue.! !
+
+!EnteroDistintoDeCeroYUno methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:46:49'!
+multiplyFraccion: aFraccionToMultiply
+
+	^ self * aFraccionToMultiply numerator / aFraccionToMultiply denominator.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'EnteroDistintoDeCeroYUno class' category: #'Numero-Exercise'!
+EnteroDistintoDeCeroYUno class
+	instanceVariableNames: ''!
+
+!EnteroDistintoDeCeroYUno class methodsFor: 'instance creation' stamp: 'AD 4/19/2018 21:46:49'!
+with: aValue 
+	
+	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
+	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
+	
+	aValue isZero ifTrue: [^ Cero new].
+	aValue isOne ifTrue: [^ Uno new].
+	
+	^ EnteroDistintoDeCeroYUno new initalizeWith: aValue! !
 
 
 !classDefinition: #Fraccion category: #'Numero-Exercise'!
@@ -402,67 +762,53 @@ hash
 	^(numerator hash / denominator hash) hash! !
 
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:21:44'!
-* aMultiplier 
-	
-	^aMultiplier multiplicarPorFraccion: self! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:26:32'!
+* aMultiplier
+	^ aMultiplier multiplyFraccion: self.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:41:19'!
-+ anAdder 
-	
-	 ^anAdder sumarFraccion: self
-	! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:25:16'!
++ anAdder
+	^ anAdder addFraccion: self.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 10:18:36'!
-/ aDivisor 
-	
-	^aDivisor divideAUnaFraccion: self! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:28:21'!
+/ aDivisor
+	^ aDivisor divideFraccion: self.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 10:16:03'!
-divideAUnEntero: unDIvidendoEntero 
-	
-	^denominator * unDIvidendoEntero / numerator 
-	! !
-
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 10:17:50'!
-divideAUnaFraccion: unDividendoFraccional 
-
-	^(denominator * unDividendoFraccional numerator) / (numerator * unDividendoFraccional denominator)
-! !
-
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:19:02'!
-multiplicarPorEntero: unMultiplicadorEntero 
-	
-		^ (self numerator * unMultiplicadorEntero) / (self denominator)
-	! !
-
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:18:21'!
-multiplicarPorFraccion: unMultiplicadorFraccional 
-	
-		^(numerator * unMultiplicadorFraccional numerator) / (denominator * unMultiplicadorFraccional denominator)! !
-
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:40:31'!
-sumarEntero: unSumandoEntero 
-	
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:24:21'!
+addEntero: unSumandoEntero
 	| newNumerator newDenominator |
+	newNumerator _ denominator * unSumandoEntero + numerator.
+	newDenominator _ denominator.
+	^ newNumerator / newDenominator.! !
 
-	newNumerator := (denominator * unSumandoEntero) + numerator.
-	newDenominator  := denominator.
-	
-	^newNumerator / newDenominator 
-	! !
-
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 09:37:44'!
-sumarFraccion: unSumandoFraccional 
-	
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:25:16'!
+addFraccion: unSumandoFraccional
 	| newNumerator newDenominator |
+	newNumerator _ numerator * unSumandoFraccional denominator + (denominator * unSumandoFraccional numerator).
+	newDenominator _ denominator * unSumandoFraccional denominator.
+	^ newNumerator / newDenominator.! !
 
-	newNumerator := (numerator * unSumandoFraccional denominator) + (denominator * unSumandoFraccional numerator).
-	newDenominator := denominator * unSumandoFraccional denominator.
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 21:06:01'!
+divideCero
 
-	
-	^newNumerator / newDenominator 
-	! !
+	^ Cero new.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:27:46'!
+divideEntero: unDIvidendoEntero
+	^ denominator * unDIvidendoEntero / numerator.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:28:21'!
+divideFraccion: unDividendoFraccional
+	^ denominator * unDividendoFraccional numerator / (numerator * unDividendoFraccional denominator).! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:33:11'!
+multiplyEntero: anEnteroToMultiply
+
+	^ self numerator * anEnteroToMultiply / self denominator.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'AD 4/19/2018 20:26:32'!
+multiplyFraccion: unMultiplicadorFraccional
+	^ numerator * unMultiplicadorFraccional numerator / (denominator * unMultiplicadorFraccional denominator).! !
 
 
 !Fraccion methodsFor: 'accessing' stamp: 'HernanWilkinson 5/7/2016 21:56'!
@@ -481,10 +827,10 @@ numerator
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'HernanWilkinson 5/7/2016 20:41'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'AD 4/19/2018 20:46:10'!
 with: aDividend over: aDivisor
 
-	| greatestCommonDivisor numerator denominator |
+"	| greatestCommonDivisor numerator denominator |
 	
 	aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
 	aDividend isZero ifTrue: [ ^aDividend ].
@@ -496,4 +842,6 @@ with: aDividend over: aDivisor
 	denominator isOne ifTrue: [ ^numerator ].
 
 	^self new initializeWith: numerator over: denominator
-	! !
+"	
+
+	^ aDividend / aDivisor.! !
