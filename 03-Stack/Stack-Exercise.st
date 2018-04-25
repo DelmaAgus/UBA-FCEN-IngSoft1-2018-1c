@@ -139,50 +139,51 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'top length'
+	instanceVariableNames: 'length top'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'testing' stamp: 'AD 4/23/2018 09:11:49'!
+!OOStack methodsFor: 'testing' stamp: 'AD 4/23/2018 16:27:19'!
 isEmpty
-	^(self size = 0)! !
+	^(length = 0)! !
 
 
-!OOStack methodsFor: 'accesing' stamp: 'AD 4/23/2018 11:59:24'!
+!OOStack methodsFor: 'accesing' stamp: 'AD 4/24/2018 16:48:09'!
 pop
 
 	|actualTop|
 	actualTop := self top.
 	
-	top := top elementBelow.
+	top := top NextStackElement.
 	length := length -1.
 	
 	^actualTop
 ! !
 
-!OOStack methodsFor: 'accesing' stamp: 'AD 4/23/2018 11:05:34'!
-push: anElement
+!OOStack methodsFor: 'accesing' stamp: 'AD 4/24/2018 16:46:10'!
+push: aValue
 	
-	length := length +1.
-	top := OOStackElement stack: anElement  over: top! !
+	
+	top := OOStackElement StacktheValue: aValue over: top.
+	length := length +1! !
 
 !OOStack methodsFor: 'accesing' stamp: 'AD 4/23/2018 10:32:35'!
 size
 
 	^length! !
 
-!OOStack methodsFor: 'accesing' stamp: 'AD 4/23/2018 11:52:31'!
+!OOStack methodsFor: 'accesing' stamp: 'AD 4/25/2018 09:13:11'!
 top
 
-	^top elementValue! !
+	^top StackElementValue.! !
 
 
-!OOStack methodsFor: 'initialization' stamp: 'AD 4/23/2018 10:31:43'!
+!OOStack methodsFor: 'initialization' stamp: 'AD 4/24/2018 16:39:39'!
 initialize
 
 	length := 0.
-	top := OOStackEmpty new! !
+	top := OOStackBase new.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -196,18 +197,36 @@ stackEmptyErrorDescription
 	^ 'Stack is empty'! !
 
 
-!classDefinition: #OOStackElement category: #'Stack-Exercise'!
-Object subclass: #OOStackElement
-	instanceVariableNames: 'elementBelow elementValue'
+!classDefinition: #OOStackBase category: #'Stack-Exercise'!
+Object subclass: #OOStackBase
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackElement methodsFor: 'initialization' stamp: 'AD 4/23/2018 11:44:30'!
-stack: anElement over: aStackElement
+!OOStackBase methodsFor: 'accessing' stamp: 'AD 4/25/2018 09:17:46'!
+StackElementValue
+
+	^self error: OOStack stackEmptyErrorDescription! !
+
+!OOStackBase methodsFor: 'accessing' stamp: 'AD 4/25/2018 09:16:59'!
+top
+
+	^self error: OOStack stackEmptyErrorDescription! !
+
+
+!classDefinition: #OOStackElement category: #'Stack-Exercise'!
+Object subclass: #OOStackElement
+	instanceVariableNames: 'next value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackElement methodsFor: 'initialization' stamp: 'AD 4/24/2018 16:12:39'!
+StacktheValue: aValue over: aStackElement
 	
-	elementBelow := aStackElement.
-	elementValue := anElement
+	next := aStackElement.
+	value := aValue
 	
 	
 
@@ -215,15 +234,15 @@ stack: anElement over: aStackElement
 	! !
 
 
-!OOStackElement methodsFor: 'accessing' stamp: 'AD 4/23/2018 11:54:24'!
-elementBelow
+!OOStackElement methodsFor: 'accessing' stamp: 'AD 4/24/2018 16:07:51'!
+NextStackElement
 
-	^elementBelow ! !
+	^next! !
 
-!OOStackElement methodsFor: 'accessing' stamp: 'AD 4/23/2018 11:51:49'!
-elementValue
+!OOStackElement methodsFor: 'accessing' stamp: 'AD 4/24/2018 16:08:59'!
+StackElementValue
 
-	^elementValue! !
+	^value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -231,20 +250,7 @@ elementValue
 OOStackElement class
 	instanceVariableNames: ''!
 
-!OOStackElement class methodsFor: 'initialization' stamp: 'AD 4/23/2018 11:39:18'!
-stack: anElement over: aStackElement
+!OOStackElement class methodsFor: 'initialization' stamp: 'AD 4/24/2018 16:13:22'!
+StacktheValue: aValue over: aStackElement
 
-	^self new stack: anElement over: aStackElement! !
-
-
-!classDefinition: #OOStackEmpty category: #'Stack-Exercise'!
-Object subclass: #OOStackEmpty
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!OOStackEmpty methodsFor: 'accesing' stamp: 'AD 4/23/2018 11:51:37'!
-elementValue
-
-	^self error: OOStack stackEmptyErrorDescription! !
+	^self new StacktheValue: aValue over: aStackElement! !
