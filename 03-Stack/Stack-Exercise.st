@@ -139,7 +139,7 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'length topElement'
+	instanceVariableNames: 'length topPiece'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
@@ -149,23 +149,23 @@ isEmpty
 	^(length = 0)! !
 
 
-!OOStack methodsFor: 'accesing' stamp: 'AD 4/26/2018 08:47:28'!
+!OOStack methodsFor: 'accesing' stamp: 'AD 4/26/2018 12:05:07'!
 pop
 
 	|actualTopContent|
 	actualTopContent := self top.
 	
-	topElement := topElement BelowStackItem.
+	topPiece := topPiece belowStackPiece.
 	length := length -1.
 	
 	^actualTopContent
 ! !
 
-!OOStack methodsFor: 'accesing' stamp: 'AD 4/26/2018 08:55:50'!
+!OOStack methodsFor: 'accesing' stamp: 'AD 4/26/2018 15:11:50'!
 push: aContent
-	topElement _ OOStackItem
-		StacktheContent: aContent
-		over: topElement.
+	topPiece _ OOStackDisk
+		stackContent: aContent
+		over: topPiece.
 	length _ length + 1.! !
 
 !OOStack methodsFor: 'accesing' stamp: 'AD 4/23/2018 10:32:35'!
@@ -173,17 +173,17 @@ size
 
 	^length! !
 
-!OOStack methodsFor: 'accesing' stamp: 'AD 4/26/2018 08:47:35'!
+!OOStack methodsFor: 'accesing' stamp: 'AD 4/26/2018 15:15:34'!
 top
 
-	^topElement Content.! !
+	^topPiece pieceContent.! !
 
 
-!OOStack methodsFor: 'initialization' stamp: 'AD 4/26/2018 08:47:02'!
+!OOStack methodsFor: 'initialization' stamp: 'AD 4/26/2018 12:04:26'!
 initialize
 
 	length := 0.
-	topElement := OOStackBase new.! !
+	topPiece := OOStackBase new.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -198,29 +198,34 @@ stackEmptyErrorDescription
 
 
 !classDefinition: #OOStackBase category: #'Stack-Exercise'!
-Object subclass: #OOStackBase
+OOStackPiece subclass: #OOStackBase
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackBase methodsFor: 'accessing' stamp: 'AD 4/26/2018 08:40:06'!
-Content
+!OOStackBase methodsFor: 'accessing' stamp: 'AD 4/26/2018 15:07:30'!
+belowStackPiece
+
+	^self error: OOStack stackEmptyErrorDescription! !
+
+!OOStackBase methodsFor: 'accessing' stamp: 'AD 4/26/2018 15:13:16'!
+pieceContent
 
 	^self error: OOStack stackEmptyErrorDescription! !
 
 
-!classDefinition: #OOStackItem category: #'Stack-Exercise'!
-Object subclass: #OOStackItem
-	instanceVariableNames: 'itemBelow content'
+!classDefinition: #OOStackDisk category: #'Stack-Exercise'!
+OOStackPiece subclass: #OOStackDisk
+	instanceVariableNames: 'pieceBelow content'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackItem methodsFor: 'initialization' stamp: 'AD 4/26/2018 08:56:02'!
-StacktheContent: aContent over: aStackItemOrStackBase
+!OOStackDisk methodsFor: 'initialization' stamp: 'AD 4/26/2018 15:06:30'!
+stackContent: aContent over: aStackPiece
 	
-	itemBelow := aStackItemOrStackBase.
+	pieceBelow := aStackPiece.
 	content := aContent
 	
 	
@@ -229,23 +234,41 @@ StacktheContent: aContent over: aStackItemOrStackBase
 	! !
 
 
-!OOStackItem methodsFor: 'accessing' stamp: 'AD 4/26/2018 08:38:21'!
-BelowStackItem
+!OOStackDisk methodsFor: 'accessing' stamp: 'AD 4/26/2018 14:13:47'!
+belowStackPiece
 
-	^itemBelow! !
+	^pieceBelow! !
 
-!OOStackItem methodsFor: 'accessing' stamp: 'AD 4/26/2018 08:40:35'!
-Content
+!OOStackDisk methodsFor: 'accessing' stamp: 'AD 4/26/2018 14:03:58'!
+pieceContent
 
 	^content! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'OOStackItem class' category: #'Stack-Exercise'!
-OOStackItem class
+!classDefinition: 'OOStackDisk class' category: #'Stack-Exercise'!
+OOStackDisk class
 	instanceVariableNames: ''!
 
-!OOStackItem class methodsFor: 'initialization' stamp: 'AD 4/26/2018 08:55:22'!
-StacktheContent: aContent over: aStackItemOrStackBase
+!OOStackDisk class methodsFor: 'initialization' stamp: 'AD 4/26/2018 14:13:05'!
+stackContent: aContent over: aStackPiece
 
-	^self new StacktheContent: aContent over: aStackItemOrStackBase! !
+	^self new stackContent: aContent over: aStackPiece! !
+
+
+!classDefinition: #OOStackPiece category: #'Stack-Exercise'!
+Object subclass: #OOStackPiece
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackPiece methodsFor: 'accessing' stamp: 'AD 4/26/2018 15:10:42'!
+belowStackPiece
+
+	^self subclassResponsibility! !
+
+!OOStackPiece methodsFor: 'accessing' stamp: 'AD 4/26/2018 15:19:07'!
+pieceContent
+
+	^self subclassResponsibility ! !
