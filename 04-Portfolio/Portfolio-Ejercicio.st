@@ -442,10 +442,10 @@ transactionsOf: anAccount
 	! !
 
 
-!Portfolio methodsFor: 'intialization' stamp: 'AD 5/7/2018 21:08:26'!
-initializeWithAll: aSetOfSummarizingAccountsToRegister
+!Portfolio methodsFor: 'intialization' stamp: 'AD 5/8/2018 11:24:37'!
+initializeWithAll: aBagOfSummarizingAccountsToRegister
 
-	registeredAccounts _ aSetOfSummarizingAccountsToRegister.! !
+	registeredAccounts _ aBagOfSummarizingAccountsToRegister.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -453,17 +453,24 @@ initializeWithAll: aSetOfSummarizingAccountsToRegister
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/7/2018 22:05:55'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/8/2018 10:25:13'!
 with: aSummarizingAccount1 with: aSummarizingAccount2
 
-	^ self withAll: (Set with: aSummarizingAccount1 with: aSummarizingAccount2 )! !
+	^ self withAll: (Bag with: aSummarizingAccount1 with: aSummarizingAccount2 )! !
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/7/2018 22:01:43'!
-withAll: aCollectionOfSummarizingAccounts
+!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/8/2018 11:21:50'!
+withAll: aBagOfSummarizingAccounts
+		
+	|QuantityofAccountsManagedByEachSummarizingAccount|
 	
-	(aCollectionOfSummarizingAccounts anySatisfy: [:anAccount | aCollectionOfSummarizingAccounts occurrencesOf: anAccount > 1]) ifTrue: [self error: self accountAlreadyManagedErrorMessage].
+	"Almacena cuantas cuentas del bag maneja cada Summarizing Account"
+	QuantityofAccountsManagedByEachSummarizingAccount := aBagOfSummarizingAccounts collect: [ :anAccount| aBagOfSummarizingAccounts count: [:anotherAccountOrTheSameAccount | anotherAccountOrTheSameAccount manages: anAccount]].
 	
-	^ self new initializeWithAll: aCollectionOfSummarizingAccounts ! !
+	"Si alguna maneja otra cuenta que no sea sí misma, es porque hay alguna cuenta repetida"
+	(QuantityofAccountsManagedByEachSummarizingAccount anySatisfy: [:aQuantityOfAccountsManagedByASummarizingAccount | aQuantityOfAccountsManagedByASummarizingAccount > 1]) 
+	ifTrue: [self error: self accountAlreadyManagedErrorMessage].
+	
+	^ self new initializeWithAll: aBagOfSummarizingAccounts ! !
 
 
 !Portfolio class methodsFor: 'error messages' stamp: 'AD 5/7/2018 21:54:01'!
@@ -516,8 +523,8 @@ manages: anAccount
 	^ self = anAccount 
 ! !
 
-!ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-registers: aTtransaction
+!ReceptiveAccount methodsFor: 'testing' stamp: 'AD 5/8/2018 11:26:00'!
+registers: aTransaction
 
-	^ transactions includes: aTtransaction 
+	^ transactions includes: aTransaction
 ! !
