@@ -453,22 +453,19 @@ initializeWithAll: aBagOfSummarizingAccountsToRegister
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/8/2018 10:25:13'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/8/2018 17:15:28'!
 with: aSummarizingAccount1 with: aSummarizingAccount2
-
+	
 	^ self withAll: (Bag with: aSummarizingAccount1 with: aSummarizingAccount2 )! !
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/8/2018 11:21:50'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/8/2018 17:54:20'!
 withAll: aBagOfSummarizingAccounts
-		
-	|QuantityofAccountsManagedByEachSummarizingAccount|
 	
-	"Almacena cuantas cuentas del bag maneja cada Summarizing Account"
-	QuantityofAccountsManagedByEachSummarizingAccount := aBagOfSummarizingAccounts collect: [ :anAccount| aBagOfSummarizingAccounts count: [:anotherAccountOrTheSameAccount | anotherAccountOrTheSameAccount manages: anAccount]].
-	
-	"Si alguna maneja otra cuenta que no sea sí misma, es porque hay alguna cuenta repetida"
-	(QuantityofAccountsManagedByEachSummarizingAccount anySatisfy: [:aQuantityOfAccountsManagedByASummarizingAccount | aQuantityOfAccountsManagedByASummarizingAccount > 1]) 
-	ifTrue: [self error: self accountAlreadyManagedErrorMessage].
+	(aBagOfSummarizingAccounts anySatisfy: [ :anAccount| 
+			| amountOfAccountsManaged |
+			amountOfAccountsManaged  _ aBagOfSummarizingAccounts count: [:anotherAccount | anAccount manages: anotherAccount].
+			amountOfAccountsManaged > 1])
+						ifTrue: [self error: self accountAlreadyManagedErrorMessage].
 	
 	^ self new initializeWithAll: aBagOfSummarizingAccounts ! !
 
