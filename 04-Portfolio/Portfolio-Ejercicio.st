@@ -289,7 +289,7 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!AccountTransaction methodsFor: 'value' stamp: 'HernanWilkinson 9/12/2011 12:25'!
+!AccountTransaction methodsFor: 'value' stamp: 'AD 5/10/2018 15:32:36'!
 value 
 
 	self subclassResponsibility ! !
@@ -300,15 +300,16 @@ value
 AccountTransaction class
 	instanceVariableNames: ''!
 
-!AccountTransaction class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:38'!
+!AccountTransaction class methodsFor: 'instance creation' stamp: 'AD 5/10/2018 15:31:54'!
 register: aValue on: account
 
-	| withdraw |
+	| aTransation |
 	
-	withdraw := self for: aValue.
-	account register: withdraw.
-		
-	^ withdraw! !
+	aTransation := self for: aValue.
+	
+	account register: aTransation.
+	
+	^ aTransation! !
 
 
 !classDefinition: #Deposit category: #'Portfolio-Ejercicio'!
@@ -318,7 +319,7 @@ AccountTransaction subclass: #Deposit
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Deposit methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:45'!
+!Deposit methodsFor: 'initialization' stamp: 'AD 5/10/2018 15:32:47'!
 initializeFor: aValue
 
 	value := aValue ! !
@@ -403,37 +404,41 @@ balance
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
-	instanceVariableNames: 'registeredAccounts'
+	instanceVariableNames: 'managedAccounts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'balance' stamp: 'AD 5/7/2018 21:01:01'!
+!Portfolio methodsFor: 'balance' stamp: 'AD 5/10/2018 15:43:11'!
 balance
-	
-	^registeredAccounts sum: [:anAccount | anAccount balance]! !
+
+	^ managedAccounts sum: [ :anAccount |
+		anAccount balance ].! !
 
 
-!Portfolio methodsFor: 'testing' stamp: 'AD 5/7/2018 21:38:08'!
+!Portfolio methodsFor: 'testing' stamp: 'AD 5/10/2018 15:43:42'!
 manages: aSummarizingAccount
-		
-		^ aSummarizingAccount = self or: [
-				registeredAccounts anySatisfy: [:aRegisteredAccount | aRegisteredAccount manages: aSummarizingAccount ]]
-! !
 
-!Portfolio methodsFor: 'testing' stamp: 'AD 5/7/2018 21:14:24'!
+	^ aSummarizingAccount = self or: [
+		managedAccounts anySatisfy: [ :aManagedAccount |
+			aManagedAccount manages: aSummarizingAccount ]].! !
+
+!Portfolio methodsFor: 'testing' stamp: 'AD 5/10/2018 15:42:54'!
 registers: aTransaction
 
-	^ registeredAccounts anySatisfy: [:anAccount | anAccount registers: aTransaction ]! !
+	^ managedAccounts anySatisfy: [ :anAccount |
+		anAccount registers: aTransaction ].! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'AD 5/7/2018 21:24:09'!
-transactions 
+!Portfolio methodsFor: 'transactions' stamp: 'AD 5/10/2018 15:43:08'!
+transactions
 
-	
-	^ registeredAccounts inject: Set new into: [:AllTransactions :anAccount | AllTransactions union: anAccount transactions ]! !
+	^ managedAccounts
+		inject: Set new
+		into: [ :AllTransactions :anAccount |
+			AllTransactions union: anAccount transactions ].! !
 
-!Portfolio methodsFor: 'transactions' stamp: 'AD 5/7/2018 21:42:30'!
+!Portfolio methodsFor: 'transactions' stamp: 'AD 5/10/2018 15:34:59'!
 transactionsOf: anAccount 
 
 	(self manages: anAccount) ifTrue: [ ^ anAccount transactions ].
@@ -442,10 +447,10 @@ transactionsOf: anAccount
 	! !
 
 
-!Portfolio methodsFor: 'intialization' stamp: 'AD 5/8/2018 11:24:37'!
-initializeWithAll: aBagOfSummarizingAccountsToRegister
+!Portfolio methodsFor: 'intialization' stamp: 'AD 5/10/2018 15:43:05'!
+initializeWithAll: aBagOfSummarizingAccountsToManage
 
-	registeredAccounts _ aBagOfSummarizingAccountsToRegister.! !
+	managedAccounts _ aBagOfSummarizingAccountsToManage.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -458,8 +463,10 @@ with: aSummarizingAccount1 with: aSummarizingAccount2
 	
 	^ self withAll: (Bag with: aSummarizingAccount1 with: aSummarizingAccount2 )! !
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/8/2018 17:54:20'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'AD 5/10/2018 15:50:52'!
 withAll: aBagOfSummarizingAccounts
+
+	"Each summarizing account shouldn't manage more than one summarizing account from the bag (itself)."
 	
 	(aBagOfSummarizingAccounts anySatisfy: [ :anAccount| 
 			| amountOfAccountsManaged |
