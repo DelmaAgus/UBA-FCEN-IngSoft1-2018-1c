@@ -511,20 +511,17 @@ accountSummaryLinesOf: aReceptiveAccount
 	
 	^aReceptiveAccount accountSummary! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-accountTransferNetOf: aReceptiveAccount 
-	
-	self shouldBeImplemented ! !
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/12/2018 10:42:20'!
+accountTransferNetOf: anAccount 
+	^ anAccount transferNet.! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-investmentEarningsOf: aReceptiveAccount 
-	
-	self shouldBeImplemented ! !
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/12/2018 13:49:37'!
+investmentEarningsOf: anAccount 
+	^ anAccount investmentEarnings! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-investmentNetOf: aReceptiveAccount 
-	
-	self shouldBeImplemented ! !
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/12/2018 12:50:59'!
+investmentNetOf: anAccount 
+	^ anAccount investmentNet! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
 portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
@@ -544,6 +541,7 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
+
 !AccountTransaction methodsFor: 'evaluating' stamp: 'HernanWilkinson 7/14/2011 06:48'!
 value
 
@@ -559,6 +557,22 @@ affectBalance: aBalance
 summary
 
 	self subclassResponsibility ! !
+
+
+!AccountTransaction methodsFor: 'queries' stamp: 'AD 5/12/2018 11:45:23'!
+affectTransferNet: aTransferNet
+
+	self subclassResponsibility.! !
+
+!AccountTransaction methodsFor: 'queries' stamp: 'AD 5/12/2018 13:54:14'!
+investmentEarnings
+
+	self subclassResponsibility ! !
+
+!AccountTransaction methodsFor: 'queries' stamp: 'AD 5/12/2018 13:54:00'!
+investmentNet
+
+	self subclassResponsibility! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -606,6 +620,27 @@ value
 
 	^ value! !
 
+
+!CertificateOfDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:04:24'!
+affectBalance: aBalance
+
+	^ aBalance - value.! !
+
+!CertificateOfDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 12:59:05'!
+affectTransferNet: aTransferNet
+
+	^ aTransferNet.! !
+
+!CertificateOfDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:51:29'!
+investmentEarnings
+	
+	^ value*(tna/360)*numberOfDays! !
+
+!CertificateOfDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:48:25'!
+investmentNet
+	
+	^ value.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'CertificateOfDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -649,15 +684,31 @@ value
 	^ value! !
 
 
-!Deposit methodsFor: 'balance' stamp: 'AD 5/10/2018 20:46:29'!
+!Deposit methodsFor: 'balance' stamp: 'AD 5/12/2018 10:50:47'!
 affectBalance: aBalance
-	^ aBalance + self value.! !
+	^ aBalance + value.! !
 
 
 !Deposit methodsFor: 'summary' stamp: 'AD 5/10/2018 19:56:26'!
 summary
 	
 	^ 'Deposito por ', self value asString.! !
+
+
+!Deposit methodsFor: 'queries' stamp: 'AD 5/12/2018 10:48:57'!
+affectTransferNet: aTransferNet
+
+	^ aTransferNet.! !
+
+!Deposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:53:32'!
+investmentEarnings
+
+	^ 0! !
+
+!Deposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:48:11'!
+investmentNet
+	
+	^ 0.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -683,7 +734,7 @@ register: aValue on: account
 
 !classDefinition: #TransferDeposit category: #'PortfolioTreePrinter-Ejercicio'!
 AccountTransaction subclass: #TransferDeposit
-	instanceVariableNames: 'value'
+	instanceVariableNames: 'transfer account'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
@@ -694,22 +745,49 @@ summary
 	^ 'Transferencia por ', self value asString! !
 
 
-!TransferDeposit methodsFor: 'value' stamp: 'AD 5/10/2018 20:50:29'!
-value
+!TransferDeposit methodsFor: 'accessing' stamp: 'AD 5/12/2018 14:00:37'!
+affectedAccount
+	^ account! !
 
-	^ value! !
+!TransferDeposit methodsFor: 'accessing' stamp: 'AD 5/12/2018 12:36:25'!
+transfer
+
+	^ transfer! !
 
 
-!TransferDeposit methodsFor: 'balance' stamp: 'AD 5/10/2018 20:51:18'!
+!TransferDeposit methodsFor: 'balance' stamp: 'AD 5/12/2018 10:51:03'!
 affectBalance: aBalance
 
-	^ aBalance + self value.! !
+	^ aBalance + value.! !
 
 
-!TransferDeposit methodsFor: 'initialization' stamp: 'AD 5/10/2018 20:56:50'!
-initializeFor: anAmount 
+!TransferDeposit methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:34:42'!
+initializeFor: aValue on: aReceptiveAccount asTransactionOf: aTransfer 
 	
-	value _ anAmount ! !
+	value _ aValue .
+	transfer _ aTransfer .
+	account _ aReceptiveAccount! !
+
+
+!TransferDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:45:38'!
+affectTransferNet: aTransferNet
+
+	^ aTransferNet + value.! !
+
+!TransferDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:53:03'!
+investmentEarnings
+
+	^ 0! !
+
+!TransferDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:44:15'!
+investmentNet
+
+	^ 0.! !
+
+
+!TransferDeposit methodsFor: 'value' stamp: 'AD 5/12/2018 13:58:12'!
+value
+	^ transfer value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -717,15 +795,29 @@ initializeFor: anAmount
 TransferDeposit class
 	instanceVariableNames: ''!
 
-!TransferDeposit class methodsFor: 'as yet unclassified' stamp: 'AD 5/10/2018 20:56:31'!
-for: anAmount 
+!TransferDeposit class methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:39:30'!
+for: aValue on: aReceptiveAccount asTransactionOf: aTransfer
+
+	^ self new initializeFor: aValue on: aReceptiveAccount asTransactionOf: aTransfer
 	
-	^ self new initializeFor: anAmount ! !
+	! !
+
+!TransferDeposit class methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:42:59'!
+register: aValue on: aAccount asTransactionOf: aTransfer 
+	
+	| transferDeposit |
+	
+	transferDeposit := self for: aValue on: aAccount asTransactionOf: aTransfer.
+	aAccount register: transferDeposit.
+		
+	^ transferDeposit
+	
+	! !
 
 
 !classDefinition: #TransferWithdraw category: #'PortfolioTreePrinter-Ejercicio'!
 AccountTransaction subclass: #TransferWithdraw
-	instanceVariableNames: 'value'
+	instanceVariableNames: 'transfer account'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
@@ -736,22 +828,52 @@ summary
 	^ 'Transferencia por ', self value negated asString! !
 
 
-!TransferWithdraw methodsFor: 'value' stamp: 'AD 5/10/2018 20:49:51'!
+!TransferWithdraw methodsFor: 'value' stamp: 'AD 5/12/2018 13:58:24'!
 value
 
-	^ value! !
+	^ transfer value! !
 
 
-!TransferWithdraw methodsFor: 'balance' stamp: 'AD 5/10/2018 20:51:06'!
+!TransferWithdraw methodsFor: 'balance' stamp: 'AD 5/12/2018 10:51:08'!
 affectBalance: aBalance
 
-	^ aBalance - self value.! !
+	^ aBalance - value.! !
 
 
-!TransferWithdraw methodsFor: 'initialization' stamp: 'AD 5/10/2018 20:55:54'!
-initializeFor: anAmount 
+!TransferWithdraw methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:32:09'!
+initializeFor: aValue on: aReceptiveAccount asTransactionOf: aTransfer 
+
+	value _ aValue.
+	transfer _ aTransfer .
+	account _ aReceptiveAccount
+	! !
+
+
+!TransferWithdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 10:50:11'!
+affectTransferNet: aTransferNet 
 	
-	value _ anAmount! !
+	^ aTransferNet - value.! !
+
+!TransferWithdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 13:52:46'!
+investmentEarnings
+
+	^ 0! !
+
+!TransferWithdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 13:47:24'!
+investmentNet
+	
+	^ 0.! !
+
+
+!TransferWithdraw methodsFor: 'accessing' stamp: 'AD 5/12/2018 14:00:52'!
+affectedAccount
+
+	^ account! !
+
+!TransferWithdraw methodsFor: 'accessing' stamp: 'AD 5/12/2018 12:20:49'!
+transfer
+
+	^ transfer! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -759,10 +881,25 @@ initializeFor: anAmount
 TransferWithdraw class
 	instanceVariableNames: ''!
 
-!TransferWithdraw class methodsFor: 'as yet unclassified' stamp: 'AD 5/10/2018 20:55:27'!
-for: anAmount 
+!TransferWithdraw class methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:40:28'!
+for: aValue on: aReceptiveAccount asTransactionOf: aTransfer
+
+	^self new initializeFor: aValue on: aReceptiveAccount asTransactionOf: aTransfer
 	
-	^ self new initializeFor: anAmount! !
+	! !
+
+!TransferWithdraw class methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:45:38'!
+register: aValue on: aAccount asTransactionOf: aTransfer 
+
+	
+	| transferWithdraw |
+	
+	transferWithdraw := self for: aValue on: aAccount asTransactionOf: aTransfer.
+	aAccount register: transferWithdraw.
+		
+	^ transferWithdraw
+	
+	! !
 
 
 !classDefinition: #Withdraw category: #'PortfolioTreePrinter-Ejercicio'!
@@ -784,15 +921,31 @@ value
 	^ value ! !
 
 
-!Withdraw methodsFor: 'balance' stamp: 'AD 5/10/2018 20:46:29'!
+!Withdraw methodsFor: 'balance' stamp: 'AD 5/12/2018 10:50:40'!
 affectBalance: aBalance
-	^ aBalance - self value.! !
+	^ aBalance - value.! !
 
 
 !Withdraw methodsFor: 'summary' stamp: 'AD 5/10/2018 19:57:07'!
 summary
 	
 	^ 'Extraccion por ', self value asString.! !
+
+
+!Withdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 10:49:32'!
+affectTransferNet: aTransferNet 
+	
+	^ aTransferNet.! !
+
+!Withdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 13:52:33'!
+investmentEarnings
+
+	^ 0! !
+
+!Withdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 13:47:51'!
+investmentNet
+	
+	^ 0.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -844,6 +997,7 @@ transactions
 
 	self subclassResponsibility ! !
 
+
 
 !classDefinition: #Portfolio category: #'PortfolioTreePrinter-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
@@ -851,6 +1005,7 @@ SummarizingAccount subclass: #Portfolio
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
+
 
 !Portfolio methodsFor: 'testing' stamp: 'HAW 5/8/2018 16:46:26'!
 anyManagedAccountManages: anAccount 
@@ -891,6 +1046,7 @@ transactionsOf: anAccount
 	! !
 
 
+
 !Portfolio methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 19:19'!
 initializeWithAll: aCollectionOfAccounts
 
@@ -913,6 +1069,17 @@ withAll: aCollectionOfAccounts
 	self checkCreationPreconditions: aCollectionOfAccounts.
 	
 	^self new initializeWithAll: aCollectionOfAccounts ! !
+
+
+!Portfolio class methodsFor: 'error messages' stamp: 'HernanWilkinson 7/13/2011 19:28'!
+accountAlreadyManagedErrorMessage
+
+	^ 'Account already managed'! !
+
+!Portfolio class methodsFor: 'error messages' stamp: 'HernanWilkinson 7/13/2011 19:27'!
+accountNotManagedMessageDescription
+	
+	^ 'Account not managed'! !
 
 
 !Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:22'!
@@ -938,17 +1105,6 @@ checkCreationPreconditions: aCollectionOfAccounts
 checkNoCircularReferencesIn: aCollectionOfAccounts
 
 	aCollectionOfAccounts do: [ :sourceAccount | self check: sourceAccount doesNotManagaAnyOf: aCollectionOfAccounts ]! !
-
-
-!Portfolio class methodsFor: 'error messages' stamp: 'HernanWilkinson 7/13/2011 19:28'!
-accountAlreadyManagedErrorMessage
-
-	^ 'Account already managed'! !
-
-!Portfolio class methodsFor: 'error messages' stamp: 'HernanWilkinson 7/13/2011 19:27'!
-accountNotManagedMessageDescription
-	
-	^ 'Account not managed'! !
 
 
 !classDefinition: #ReceptiveAccount category: #'PortfolioTreePrinter-Ejercicio'!
@@ -984,6 +1140,7 @@ transactions
 	^ transactions copy! !
 
 
+
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 manages: anAccount
 
@@ -1002,16 +1159,42 @@ accountSummary
 
 	^ transactions collect: [:transaction | transaction summary]! !
 
+
+!ReceptiveAccount methodsFor: 'queries' stamp: 'AD 5/12/2018 13:50:22'!
+investmentEarnings
+	
+	^ transactions sum: [:transaction | transaction investmentEarnings]! !
+
+!ReceptiveAccount methodsFor: 'queries' stamp: 'AD 5/12/2018 13:46:11'!
+investmentNet
+	
+	^ transactions sum: [ :transaction | transaction investmentNet].! !
+
+!ReceptiveAccount methodsFor: 'queries' stamp: 'AD 5/12/2018 10:48:07'!
+transferNet
+	
+	^ transactions inject: 0 into: [:transferNet :transaction | transaction affectTransferNet: transferNet].! !
+
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
 Object subclass: #Transfer
-	instanceVariableNames: ''
+	instanceVariableNames: 'value transferWithdraw tranferDeposit'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
+!Transfer methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:11:37'!
+initializeFor: aValue with: aTransferWithdraw with: aTransferDeposit 
+
+	value _ aValue .
+	transferWithdraw _ aTransferWithdraw .
+	tranferDeposit _ aTransferDeposit ! !
 
 
+!Transfer methodsFor: 'value' stamp: 'AD 5/12/2018 12:19:23'!
+value
+
+	^ value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1019,101 +1202,15 @@ Object subclass: #Transfer
 Transfer class
 	instanceVariableNames: ''!
 
-!Transfer class methodsFor: 'instance creation' stamp: 'AD 5/10/2018 20:34:20'!
-register: anAmount from: sourceAccount to: destinationAccount 
+!Transfer class methodsFor: 'instance creation' stamp: 'AD 5/12/2018 12:24:47'!
+register: anAmount from: sourceAccount to: destinationAccount
 
-	| transferWithdraw transferDeposit |
+	| deposit withdraw transfer|
 	
-	transferWithdraw := TransferWithdraw register: anAmount on: sourceAccount.
-	sourceAccount register: transferWithdraw.
+	transfer _ self new.
 	
-	transferDeposit := TransferDeposit register: anAmount on: destinationAccount.
-	destinationAccount register: transferDeposit.
-
-	"Withdraw register: anAmount on: sourceAccount.
-	Deposit register: anAmount on: destinationAccount."! !
-
-
-
-!classDefinition: #TransferDeposit category: #'PortfolioTreePrinter-Ejercicio'!
-AccountTransaction subclass: #TransferDeposit
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!TransferDeposit methodsFor: 'summary' stamp: 'AD 5/10/2018 20:49:23'!
-summary
-
-	^ 'Transferencia por ', self value asString! !
-
-
-!TransferDeposit methodsFor: 'value' stamp: 'AD 5/10/2018 20:50:29'!
-value
-
-	^ value! !
-
-
-!TransferDeposit methodsFor: 'balance' stamp: 'AD 5/10/2018 20:51:18'!
-affectBalance: aBalance
-
-	^ aBalance + self value.! !
-
-
-!TransferDeposit methodsFor: 'initialization' stamp: 'AD 5/10/2018 20:56:50'!
-initializeFor: anAmount 
+	withdraw _ TransferWithdraw register: anAmount on: sourceAccount asTransactionOf: transfer.
 	
-	value _ anAmount ! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
-TransferDeposit class
-	instanceVariableNames: ''!
-
-!TransferDeposit class methodsFor: 'as yet unclassified' stamp: 'AD 5/10/2018 20:56:31'!
-for: anAmount 
+	deposit _ TransferDeposit register: anAmount on: destinationAccount asTransactionOf: transfer.
 	
-	^ self new initializeFor: anAmount ! !
-
-
-!classDefinition: #TransferWithdraw category: #'PortfolioTreePrinter-Ejercicio'!
-AccountTransaction subclass: #TransferWithdraw
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!TransferWithdraw methodsFor: 'summary' stamp: 'AD 5/10/2018 20:49:08'!
-summary
-
-	^ 'Transferencia por ', self value negated asString! !
-
-
-!TransferWithdraw methodsFor: 'value' stamp: 'AD 5/10/2018 20:49:51'!
-value
-
-	^ value! !
-
-
-!TransferWithdraw methodsFor: 'balance' stamp: 'AD 5/10/2018 20:51:06'!
-affectBalance: aBalance
-
-	^ aBalance - self value.! !
-
-
-!TransferWithdraw methodsFor: 'initialization' stamp: 'AD 5/10/2018 20:55:54'!
-initializeFor: anAmount 
-	
-	value _ anAmount! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferWithdraw class' category: #'PortfolioTreePrinter-Ejercicio'!
-TransferWithdraw class
-	instanceVariableNames: ''!
-
-!TransferWithdraw class methodsFor: 'as yet unclassified' stamp: 'AD 5/10/2018 20:55:27'!
-for: anAmount 
-	
-	^ self new initializeFor: anAmount! !
+	^ transfer initializeFor: anAmount with: withdraw with: deposit! !
