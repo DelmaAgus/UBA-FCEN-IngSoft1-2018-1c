@@ -755,10 +755,10 @@ transfer
 	^ transfer! !
 
 
-!TransferDeposit methodsFor: 'balance' stamp: 'AD 5/12/2018 10:51:03'!
+!TransferDeposit methodsFor: 'balance' stamp: 'AD 5/12/2018 21:06:43'!
 affectBalance: aBalance
 
-	^ aBalance + value.! !
+	^ aBalance + self value.! !
 
 
 !TransferDeposit methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:34:42'!
@@ -769,10 +769,10 @@ initializeFor: aValue on: aReceptiveAccount asTransactionOf: aTransfer
 	account _ aReceptiveAccount! !
 
 
-!TransferDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:45:38'!
+!TransferDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 21:08:27'!
 affectTransferNet: aTransferNet
 
-	^ aTransferNet + value.! !
+	^ aTransferNet + self value.! !
 
 !TransferDeposit methodsFor: 'queries' stamp: 'AD 5/12/2018 13:53:03'!
 investmentEarnings
@@ -834,10 +834,10 @@ value
 	^ transfer value! !
 
 
-!TransferWithdraw methodsFor: 'balance' stamp: 'AD 5/12/2018 10:51:08'!
+!TransferWithdraw methodsFor: 'balance' stamp: 'AD 5/12/2018 21:06:50'!
 affectBalance: aBalance
 
-	^ aBalance - value.! !
+	^ aBalance - self value.! !
 
 
 !TransferWithdraw methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:32:09'!
@@ -849,10 +849,10 @@ initializeFor: aValue on: aReceptiveAccount asTransactionOf: aTransfer
 	! !
 
 
-!TransferWithdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 10:50:11'!
+!TransferWithdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 21:08:54'!
 affectTransferNet: aTransferNet 
 	
-	^ aTransferNet - value.! !
+	^ aTransferNet - self value.! !
 
 !TransferWithdraw methodsFor: 'queries' stamp: 'AD 5/12/2018 13:52:46'!
 investmentEarnings
