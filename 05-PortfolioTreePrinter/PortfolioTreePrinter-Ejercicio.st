@@ -964,6 +964,23 @@ initializeFor: anAccount
 
 	account _ anAccount.! !
 
+
+!AccountTransactionsVisitor methodsFor: 'transactions' stamp: 'AD 5/16/2018 17:35:23'!
+accountTransactionsSum: aBlock
+
+	| sum |
+	
+	sum  _ 0.
+	
+	account transactionsDo: [:transaction | sum _ sum + (aBlock value: transaction)].
+	
+	^ sum! !
+
+!AccountTransactionsVisitor methodsFor: 'transactions' stamp: 'AD 5/16/2018 17:49:12'!
+sumTransactionsAcceptance
+
+	^ self accountTransactionsSum: [:transaction | transaction accept: self].! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'AccountTransactionsVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -982,16 +999,10 @@ AccountTransactionsVisitor subclass: #AccountInvestmentEarningsVisitor
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!AccountInvestmentEarningsVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:04'!
+!AccountInvestmentEarningsVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 17:50:30'!
 value
 
-	|investmentEarnings|
-	
-	investmentEarnings  _ 0.
-	
-	account transactionsDo: [:transaction | investmentEarnings _ investmentEarnings + (transaction accept: self)].
-	
-	^investmentEarnings
+	^ self sumTransactionsAcceptance
 	
 ! !
 
@@ -1029,18 +1040,10 @@ AccountTransactionsVisitor subclass: #AccountInvestmentNetVisitor
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!AccountInvestmentNetVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:10'!
+!AccountInvestmentNetVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 17:50:22'!
 value
 
-	|investmentNet|
-	
-	investmentNet  _ 0.
-	
-	account transactionsDo: [:transaction | investmentNet _ investmentNet + (transaction accept: self)].
-	
-	^investmentNet
-	
-! !
+	^ self sumTransactionsAcceptance! !
 
 
 !AccountInvestmentNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:57:05'!
@@ -1118,17 +1121,9 @@ AccountTransactionsVisitor subclass: #AccountTransferNetVisitor
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!AccountTransferNetVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:28'!
+!AccountTransferNetVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 17:50:06'!
 value
-
-	|transferNet|
-	
-	transferNet  _ 0.
-	
-	account transactionsDo: [:transaction | transferNet _ transferNet + (transaction accept: self)].
-	
-	^transferNet
-	
+	^ self sumTransactionsAcceptance
 ! !
 
 
