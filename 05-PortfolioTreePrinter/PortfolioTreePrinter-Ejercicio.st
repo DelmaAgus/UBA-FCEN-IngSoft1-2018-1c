@@ -528,35 +528,43 @@ test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 	self assert: 'composedPortfolio' = (lines at: 5).! !
 
 
-!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/15/2018 15:53:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:50:39'!
 accountSummaryLinesOf: aReceptiveAccount
+	^ (AccountSummaryVisitor for: aReceptiveAccount) value.! !
 
-	^ (SummaryVisitor of: aReceptiveAccount) value.! !
-
-!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/15/2018 15:53:46'!
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:50:39'!
 accountTransferNetOf: anAccount
+	^ (AccountTransferNetVisitor for: anAccount) value.! !
 
-	^ (TransferNetVisitor of: anAccount) value.! !
-
-!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/15/2018 15:53:50'!
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:50:39'!
 investmentEarningsOf: anAccount
+	^ (AccountInvestmentEarningsVisitor for: anAccount) value.! !
 
-	^ (InvestmentEarningsVisitor of: anAccount) value.! !
-
-!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/15/2018 15:53:54'!
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:50:39'!
 investmentNetOf: anAccount
+	^ (AccountInvestmentNetVisitor for: anAccount) value.! !
 
-	^ (InvestmentNetVisitor of: anAccount) value.! !
-
-!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/15/2018 15:53:58'!
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:39:17'!
 portfolioTreeOf: aPortfolio namingAccountWith: aDictionary
+	^ (PortfolioDepthFirstTreePrinterVisitor
+		for: aPortfolio
+		namingAccountsWith: aDictionary) value.! !
 
-	self shouldBeImplemented.! !
+!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
+	
+	self shouldBeImplemented ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/15/2018 15:54:02'!
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:39:43'!
 reversePortfolioTreeOf: aPortfolio namingAccountWith: aDictionary
+	^ (PorfolioReverseTreePrinterVisitor
+		for: aPortfolio
+		namingAccountsWith: aDictionary) value.! !
 
-	self shouldBeImplemented.! !
+!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+reversePortofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
+	
+	self shouldBeImplemented ! !
 
 
 !classDefinition: #AccountTransaction category: #'PortfolioTreePrinter-Ejercicio'!
@@ -566,7 +574,7 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!AccountTransaction methodsFor: 'evaluating' stamp: 'HernanWilkinson 7/14/2011 06:48'!
+!AccountTransaction methodsFor: 'accessing' stamp: 'HernanWilkinson 7/14/2011 06:48'!
 value
 
 	self subclassResponsibility ! !
@@ -577,7 +585,7 @@ affectBalance: aBalance
 	self subclassResponsibility.! !
 
 
-!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:01:39'!
+!AccountTransaction methodsFor: 'visitor acceptance' stamp: 'AD 5/15/2018 15:01:39'!
 accept: aVisitor
 
 	self subclassResponsibility! !
@@ -637,7 +645,7 @@ affectBalance: aBalance
 	^ aBalance - value.! !
 
 
-!CertificateOfDeposit methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:03:39'!
+!CertificateOfDeposit methodsFor: 'visitor acceptance' stamp: 'AD 5/15/2018 15:03:39'!
 accept: aVisitor
 
 	^ aVisitor visitCertificateOfDeposit: self.! !
@@ -679,7 +687,7 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
+!Deposit methodsFor: 'accessing' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
 
 	^ value! !
@@ -690,7 +698,7 @@ affectBalance: aBalance
 	^ aBalance + value.! !
 
 
-!Deposit methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:05:09'!
+!Deposit methodsFor: 'visitor acceptance' stamp: 'AD 5/15/2018 15:05:09'!
 accept: aVisitor
 
 	^ aVisitor visitDeposit: self.! !
@@ -783,10 +791,35 @@ affectBalance: aBalance
 	^ aBalance + self value.! !
 
 
-!TransferDeposit methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:09:22'!
+!TransferDeposit methodsFor: 'visitor acceptance' stamp: 'AD 5/15/2018 15:09:22'!
 accept: aVisitor
 
 	^ aVisitor visitTransferDeposit: self.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
+TransferDeposit class
+	instanceVariableNames: ''!
+
+!TransferDeposit class methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:39:30'!
+for: aValue on: aReceptiveAccount asTransactionOf: aTransfer
+
+	^ self new initializeFor: aValue on: aReceptiveAccount asTransactionOf: aTransfer
+	
+	! !
+
+!TransferDeposit class methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:42:59'!
+register: aValue on: aAccount asTransactionOf: aTransfer 
+	
+	| transferDeposit |
+	
+	transferDeposit := self for: aValue on: aAccount asTransactionOf: aTransfer.
+	aAccount register: transferDeposit.
+		
+	^ transferDeposit
+	
+	! !
 
 
 !classDefinition: #TransferWithdraw category: #'PortfolioTreePrinter-Ejercicio'!
@@ -802,10 +835,36 @@ affectBalance: aBalance
 	^ aBalance - self value.! !
 
 
-!TransferWithdraw methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:10:38'!
+!TransferWithdraw methodsFor: 'visitor acceptance' stamp: 'AD 5/15/2018 15:10:38'!
 accept: aVisitor
 
 	^ aVisitor visitTransferWithdraw: self.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferWithdraw class' category: #'PortfolioTreePrinter-Ejercicio'!
+TransferWithdraw class
+	instanceVariableNames: ''!
+
+!TransferWithdraw class methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:40:28'!
+for: aValue on: aReceptiveAccount asTransactionOf: aTransfer
+
+	^self new initializeFor: aValue on: aReceptiveAccount asTransactionOf: aTransfer
+	
+	! !
+
+!TransferWithdraw class methodsFor: 'initialization' stamp: 'AD 5/12/2018 12:45:38'!
+register: aValue on: aAccount asTransactionOf: aTransfer 
+
+	
+	| transferWithdraw |
+	
+	transferWithdraw := self for: aValue on: aAccount asTransactionOf: aTransfer.
+	aAccount register: transferWithdraw.
+		
+	^ transferWithdraw
+	
+	! !
 
 
 !classDefinition: #Withdraw category: #'PortfolioTreePrinter-Ejercicio'!
@@ -821,7 +880,7 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/14/2011 05:54'!
+!Withdraw methodsFor: 'accessing' stamp: 'HernanWilkinson 7/14/2011 05:54'!
 value
 
 	^ value ! !
@@ -832,7 +891,7 @@ affectBalance: aBalance
 	^ aBalance - value.! !
 
 
-!Withdraw methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:11:13'!
+!Withdraw methodsFor: 'visitor acceptance' stamp: 'AD 5/15/2018 15:11:13'!
 accept: aVisitor
 
 	^ aVisitor visitWithdraw: self.! !
@@ -857,6 +916,337 @@ register: aValue on: account
 	account register: withdraw.
 		
 	^ withdraw! !
+
+
+!classDefinition: #AccountTransactionsVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #AccountTransactionsVisitor
+	instanceVariableNames: 'account'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountTransactionsVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:51:33'!
+value
+
+	^ self subclassResponsibility
+	
+! !
+
+
+!AccountTransactionsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:58'!
+visitCertificateOfDeposit: aCertificateOfDeposit
+
+	self subclassResponsibility! !
+
+!AccountTransactionsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:31'!
+visitDeposit: aDeposit
+
+	self subclassResponsibility! !
+
+!AccountTransactionsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:55:58'!
+visitTransferDeposit: aTranferDeposit
+
+	self subclassResponsibility! !
+
+!AccountTransactionsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:55:28'!
+visitTransferWithdraw: aTransferWithdraw
+
+	self subclassResponsibility! !
+
+!AccountTransactionsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:54:56'!
+visitWithdraw: aWithdraw
+
+	self subclassResponsibility! !
+
+
+!AccountTransactionsVisitor methodsFor: 'initialization' stamp: 'AD 5/16/2018 16:51:19'!
+initializeFor: anAccount
+
+	account _ anAccount.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'AccountTransactionsVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor class
+	instanceVariableNames: ''!
+
+!AccountTransactionsVisitor class methodsFor: 'instance creation' stamp: 'AD 5/16/2018 16:51:15'!
+for: anAccount
+	^ self new initializeFor: anAccount.! !
+
+
+!classDefinition: #AccountInvestmentEarningsVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor subclass: #AccountInvestmentEarningsVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountInvestmentEarningsVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:04'!
+value
+
+	|investmentEarnings|
+	
+	investmentEarnings  _ 0.
+	
+	account transactionsDo: [:transaction | investmentEarnings _ investmentEarnings + (transaction accept: self)].
+	
+	^investmentEarnings
+	
+! !
+
+
+!AccountInvestmentEarningsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:57:16'!
+visitCertificateOfDeposit: aCertificateOfDeposit
+
+	^ aCertificateOfDeposit value * (aCertificateOfDeposit tna / 360) * aCertificateOfDeposit numberOfDays.! !
+
+!AccountInvestmentEarningsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:42'!
+visitDeposit: aDeposit
+
+	^ 0.! !
+
+!AccountInvestmentEarningsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:08'!
+visitTransferDeposit: aTranferDeposit
+
+	^ 0.! !
+
+!AccountInvestmentEarningsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:55:40'!
+visitTransferWithdraw: aTransferWithdraw
+
+	^ 0.! !
+
+!AccountInvestmentEarningsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:55:07'!
+visitWithdraw: aWithdraw
+
+	^ 0.! !
+
+
+!classDefinition: #AccountInvestmentNetVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor subclass: #AccountInvestmentNetVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountInvestmentNetVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:10'!
+value
+
+	|investmentNet|
+	
+	investmentNet  _ 0.
+	
+	account transactionsDo: [:transaction | investmentNet _ investmentNet + (transaction accept: self)].
+	
+	^investmentNet
+	
+! !
+
+
+!AccountInvestmentNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:57:05'!
+visitCertificateOfDeposit: aCertificateOfDeposit
+
+ 	^ aCertificateOfDeposit value
+	! !
+
+!AccountInvestmentNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:36'!
+visitDeposit: aDeposit
+
+	^ 0.! !
+
+!AccountInvestmentNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:04'!
+visitTransferDeposit: aTranferDeposit
+
+	^ 0.! !
+
+!AccountInvestmentNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:55:35'!
+visitTransferWithdraw: aTransferWithdraw
+
+	^ 0.! !
+
+!AccountInvestmentNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:55:04'!
+visitWithdraw: aWithdraw
+
+	^ 0.! !
+
+
+!classDefinition: #AccountSummaryVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor subclass: #AccountSummaryVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountSummaryVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:53:40'!
+value
+
+	^ account transactionsCollect: [:transaction | transaction accept: self]! !
+
+
+!AccountSummaryVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:53:54'!
+visitCertificateOfDeposit: aCertificateOfDeposit
+
+	^ 'Plazo fijo por ' , aCertificateOfDeposit value printString , 
+		' durante ' , aCertificateOfDeposit numberOfDays printString ,
+		' dias a una tna de ' , (aCertificateOfDeposit tna * 100) printString , '%'.! !
+
+!AccountSummaryVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:54:02'!
+visitDeposit: aDeposit
+
+	^ 'Deposito por ' , aDeposit value printString.! !
+
+!AccountSummaryVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:54:14'!
+visitTransferDeposit: aTranferDeposit
+
+	^ 'Transferencia por ' , aTranferDeposit value printString.! !
+
+!AccountSummaryVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:54:30'!
+visitTransferWithdraw: aTransferWithdraw
+
+	^ 'Transferencia por ' , aTransferWithdraw value negated printString.! !
+
+!AccountSummaryVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:54:38'!
+visitWithdraw: aWithdraw
+
+	^ 'Extraccion por ' , aWithdraw value printString.! !
+
+
+!classDefinition: #AccountTransferNetVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor subclass: #AccountTransferNetVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountTransferNetVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:28'!
+value
+
+	|transferNet|
+	
+	transferNet  _ 0.
+	
+	account transactionsDo: [:transaction | transferNet _ transferNet + (transaction accept: self)].
+	
+	^transferNet
+	
+! !
+
+
+!AccountTransferNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:54'!
+visitCertificateOfDeposit: aCertificateOfDeposit
+
+	^ 0.! !
+
+!AccountTransferNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:26'!
+visitDeposit: aDeposit
+
+	^ 0.! !
+
+!AccountTransferNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:55:53'!
+visitTransferDeposit: aTranferDeposit
+
+	^ aTranferDeposit value.! !
+
+!AccountTransferNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:55:24'!
+visitTransferWithdraw: aTransferWithdraw
+
+	^ aTransferWithdraw value negated.! !
+
+!AccountTransferNetVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:54:51'!
+visitWithdraw: aWithdraw
+
+	^ 0.! !
+
+
+!classDefinition: #PorfolioTreePrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #PorfolioTreePrinterVisitor
+	instanceVariableNames: 'accountNames portfolio'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:15'!
+visitPortfolio: aPortfolio
+
+	self subclassResponsibility.! !
+
+!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:24'!
+visitReceptiveAccount: aReceptiveAccount
+
+	self subclassResponsibility.! !
+
+
+!PorfolioTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:03:13'!
+value
+
+	self subclassResponsibility.! !
+
+
+!PorfolioTreePrinterVisitor methodsFor: 'initialization' stamp: 'AD 5/16/2018 17:17:53'!
+initializeFor: aPortfolio namingAccountsWith: aDictionaryOfAccountNames
+
+	accountNames _ aDictionaryOfAccountNames.
+	
+	portfolio _ aPortfolio.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PorfolioTreePrinterVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
+PorfolioTreePrinterVisitor class
+	instanceVariableNames: ''!
+
+!PorfolioTreePrinterVisitor class methodsFor: 'instance creation' stamp: 'AD 5/16/2018 16:48:58'!
+for: aPortfolio namingAccountsWith: aDictionaryOfAccountNames
+ 
+	^ self new initializeFor: aPortfolio namingAccountsWith: aDictionaryOfAccountNames! !
+
+
+!classDefinition: #PorfolioReverseTreePrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+PorfolioTreePrinterVisitor subclass: #PorfolioReverseTreePrinterVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!PorfolioReverseTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:35:00'!
+value
+
+	self shouldBeImplemented.! !
+
+
+!PorfolioReverseTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:35:38'!
+visitPortfolio: aPortfolio
+
+	self shouldBeImplemented.! !
+
+!PorfolioReverseTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:35:56'!
+visitReceptiveAccount: aReceptiveAccount
+
+	self shouldBeImplemented.! !
+
+
+!classDefinition: #PortfolioDepthFirstTreePrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+PorfolioTreePrinterVisitor subclass: #PortfolioDepthFirstTreePrinterVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:04:18'!
+value
+
+	self shouldBeImplemented.! !
+
+
+!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:48'!
+visitPortfolio: aPortfolio
+
+	self shouldBeImplemented.! !
+
+!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:57'!
+visitReceptiveAccount: aReceptiveAccount
+
+	self shouldBeImplemented.! !
 
 
 !classDefinition: #SummarizingAccount category: #'PortfolioTreePrinter-Ejercicio'!
@@ -887,6 +1277,13 @@ transactions
 
 	self subclassResponsibility ! !
 
+
+
+!SummarizingAccount methodsFor: 'visitor acceptance' stamp: 'AD 5/16/2018 16:26:45'!
+accept: aVisitor
+
+	self subclassResponsibility! !
+
 
 !classDefinition: #Portfolio category: #'PortfolioTreePrinter-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
@@ -894,6 +1291,7 @@ SummarizingAccount subclass: #Portfolio
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
+
 
 !Portfolio methodsFor: 'testing' stamp: 'HAW 5/8/2018 16:46:26'!
 anyManagedAccountManages: anAccount 
@@ -938,6 +1336,12 @@ transactionsOf: anAccount
 initializeWithAll: aCollectionOfAccounts
 
 	accounts := aCollectionOfAccounts   ! !
+
+
+!Portfolio methodsFor: 'visitor acceptance' stamp: 'AD 5/16/2018 16:28:27'!
+accept: aVisitor
+
+	^ aVisitor visitPortfolio: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1037,6 +1441,7 @@ transactionsDo: aBlock
 	^ transactions do: [:transaction | aBlock value: transaction].! !
 
 
+
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 manages: anAccount
 
@@ -1049,311 +1454,11 @@ registers: aTtransaction
 	^ transactions includes: aTtransaction 
 ! !
 
-
-!classDefinition: #TransactionVisitor category: #'PortfolioTreePrinter-Ejercicio'!
-Object subclass: #TransactionVisitor
-	instanceVariableNames: 'account'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!TransactionVisitor methodsFor: 'initialization' stamp: 'AD 5/15/2018 15:17:14'!
-initializeOf: anAccount 
+!ReceptiveAccount methodsFor: 'visitor acceptance' stamp: 'AD 5/16/2018 16:26:18'!
+accept: aVisitor
 
-	account _ anAccount.! !
-
-
-!TransactionVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:17:43'!
-value
-		^ self subclassResponsibility
-	
-! !
-
-
-!TransactionVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:18:08'!
-visitCertificateOfDeposit: aTransaction
-
-		^ self subclassResponsibility! !
-
-!TransactionVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:18:14'!
-visitDeposit: aTransaction
-
-			^ self subclassResponsibility! !
-
-!TransactionVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:18:22'!
-visitTransferDeposit: aTransaction
-
-			^ self subclassResponsibility! !
-
-!TransactionVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:18:29'!
-visitTransferWithdraw: aTransaction
-
-		^ self subclassResponsibility! !
-
-!TransactionVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:18:36'!
-visitWithdraw: aTransaction
-
-		^ self subclassResponsibility! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransactionVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
-TransactionVisitor class
-	instanceVariableNames: ''!
-
-!TransactionVisitor class methodsFor: 'instance creation' stamp: 'AD 5/15/2018 15:17:14'!
-of: anAccount
-
-	^ self new initializeOf: anAccount.! !
-
-
-!classDefinition: #InvestmentEarningsVisitor category: #'PortfolioTreePrinter-Ejercicio'!
-TransactionVisitor subclass: #InvestmentEarningsVisitor
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!InvestmentEarningsVisitor methodsFor: 'initialization' stamp: 'AD 5/14/2018 22:23:10'!
-initializeOf: anAccount 
-
-	account _ anAccount.! !
-
-
-!InvestmentEarningsVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:04'!
-value
-
-	|investmentEarnings|
-	
-	investmentEarnings  _ 0.
-	
-	account transactionsDo: [:transaction | investmentEarnings _ investmentEarnings + (transaction accept: self)].
-	
-	^investmentEarnings
-	
-! !
-
-
-!InvestmentEarningsVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:06:14'!
-visitCertificateOfDeposit: aTransaction
-
-	^ aTransaction value * (aTransaction tna / 360) * aTransaction numberOfDays.! !
-
-!InvestmentEarningsVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:06:29'!
-visitDeposit: aTransaction
-
-	^ 0.! !
-
-!InvestmentEarningsVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:06:32'!
-visitTransferDeposit: aTransaction
-
-	^ 0.! !
-
-!InvestmentEarningsVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:06:36'!
-visitTransferWithdraw: aTransaction
-
-	^ 0.! !
-
-!InvestmentEarningsVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:06:41'!
-visitWithdraw: aTransaction
-
-	^ 0.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'InvestmentEarningsVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
-InvestmentEarningsVisitor class
-	instanceVariableNames: ''!
-
-!InvestmentEarningsVisitor class methodsFor: 'instance creation' stamp: 'AD 5/14/2018 22:23:10'!
-of: anAccount
-
-	^ self new initializeOf: anAccount.! !
-
-
-!classDefinition: #InvestmentNetVisitor category: #'PortfolioTreePrinter-Ejercicio'!
-TransactionVisitor subclass: #InvestmentNetVisitor
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!InvestmentNetVisitor methodsFor: 'initialization' stamp: 'AD 5/14/2018 22:20:59'!
-initializeOf: anAccount 
-
-	account _ anAccount.! !
-
-
-!InvestmentNetVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:10'!
-value
-
-	|investmentNet|
-	
-	investmentNet  _ 0.
-	
-	account transactionsDo: [:transaction | investmentNet _ investmentNet + (transaction accept: self)].
-	
-	^investmentNet
-	
-! !
-
-
-!InvestmentNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 14:51:37'!
-visitCertificateOfDeposit: aTransaction
-
- 	^ aTransaction value
-	! !
-
-!InvestmentNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:06:55'!
-visitDeposit: aTransaction
-
-	^ 0.! !
-
-!InvestmentNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:06:58'!
-visitTransferDeposit: aTransaction
-
-	^ 0.! !
-
-!InvestmentNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:07:02'!
-visitTransferWithdraw: aTransaction
-
-	^ 0.! !
-
-!InvestmentNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:07:06'!
-visitWithdraw: aTransaction
-
-	^ 0.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'InvestmentNetVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
-InvestmentNetVisitor class
-	instanceVariableNames: ''!
-
-!InvestmentNetVisitor class methodsFor: 'instance creation' stamp: 'AD 5/14/2018 22:20:59'!
-of: anAccount
-
-	^ self new initializeOf: anAccount.! !
-
-
-!classDefinition: #SummaryVisitor category: #'PortfolioTreePrinter-Ejercicio'!
-TransactionVisitor subclass: #SummaryVisitor
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!SummaryVisitor methodsFor: 'initialization' stamp: 'AD 5/14/2018 18:42:57'!
-initializeOf: anAccount 
-
-	account _ anAccount.! !
-
-
-!SummaryVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:18'!
-value
-
-	^ account transactionsCollect: [:transaction | transaction accept: self]! !
-
-
-!SummaryVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:07:58'!
-visitCertificateOfDeposit: aTransaction
-
-	^ 'Plazo fijo por ' , aTransaction value printString , ' durante ' , aTransaction numberOfDays printString , ' dias a una tna de ' , (aTransaction tna * 100) printString , '%'.! !
-
-!SummaryVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:08:04'!
-visitDeposit: aTransaction
-
-	^ 'Deposito por ' , aTransaction value printString.! !
-
-!SummaryVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:08:08'!
-visitTransferDeposit: aTransaction
-
-	^ 'Transferencia por ' , aTransaction value printString.! !
-
-!SummaryVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:08:12'!
-visitTransferWithdraw: aTransaction
-
-	^ 'Transferencia por ' , aTransaction value negated printString.! !
-
-!SummaryVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:08:15'!
-visitWithdraw: aTransaction
-
-	^ 'Extraccion por ' , aTransaction value printString.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'SummaryVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
-SummaryVisitor class
-	instanceVariableNames: ''!
-
-!SummaryVisitor class methodsFor: 'instance creation' stamp: 'AD 5/14/2018 18:40:20'!
-of: anAccount
-
-	^ self new initializeOf: anAccount.! !
-
-
-!classDefinition: #TransferNetVisitor category: #'PortfolioTreePrinter-Ejercicio'!
-TransactionVisitor subclass: #TransferNetVisitor
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!TransferNetVisitor methodsFor: 'initialization' stamp: 'AD 5/14/2018 20:37:16'!
-initializeOf: anAccount 
-
-	account _ anAccount.! !
-
-
-!TransferNetVisitor methodsFor: 'value' stamp: 'AD 5/15/2018 15:02:28'!
-value
-
-	|transferNet|
-	
-	transferNet  _ 0.
-	
-	account transactionsDo: [:transaction | transferNet _ transferNet + (transaction accept: self)].
-	
-	^transferNet
-	
-! !
-
-
-!TransferNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:09:53'!
-visitCertificateOfDeposit: aTransaction
-
-	^ 0.! !
-
-!TransferNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:09:57'!
-visitDeposit: aTransaction
-
-	^ 0.! !
-
-!TransferNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:10:00'!
-visitTransferDeposit: aTransaction
-
-	^ aTransaction value.! !
-
-!TransferNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:10:04'!
-visitTransferWithdraw: aTransaction
-
-	^ aTransaction value negated.! !
-
-!TransferNetVisitor methodsFor: 'as yet unclassified' stamp: 'AD 5/15/2018 15:10:07'!
-visitWithdraw: aTransaction
-
-	^ 0.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferNetVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
-TransferNetVisitor class
-	instanceVariableNames: ''!
-
-!TransferNetVisitor class methodsFor: 'instance creation' stamp: 'AD 5/14/2018 20:37:16'!
-of: anAccount
-
-	^ self new initializeOf: anAccount.! !
+	^ aVisitor visitReceptiveAccount: self! !
 
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1369,6 +1474,7 @@ initializeFor: aValue with: aTransferWithdraw with: aTransferDeposit
 	value _ aValue .
 	transferWithdraw _ aTransferWithdraw .
 	tranferDeposit _ aTransferDeposit ! !
+
 
 
 !Transfer methodsFor: 'accessing' stamp: 'AD 5/14/2018 17:16:05'!
