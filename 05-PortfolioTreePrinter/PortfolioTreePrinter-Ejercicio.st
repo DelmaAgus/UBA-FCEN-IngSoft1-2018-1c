@@ -550,21 +550,11 @@ portfolioTreeOf: aPortfolio namingAccountWith: aDictionary
 		for: aPortfolio
 		namingAccountsWith: aDictionary) value.! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
-	
-	self shouldBeImplemented ! !
-
 !PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:39:43'!
 reversePortfolioTreeOf: aPortfolio namingAccountWith: aDictionary
 	^ (PorfolioReverseTreePrinterVisitor
 		for: aPortfolio
 		namingAccountsWith: aDictionary) value.! !
-
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
-reversePortofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
-	
-	self shouldBeImplemented ! !
 
 
 !classDefinition: #AccountTransaction category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1227,21 +1217,53 @@ PorfolioTreePrinterVisitor subclass: #PortfolioDepthFirstTreePrinterVisitor
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:04:18'!
+!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/17/2018 09:52:37'!
 value
 
-	self shouldBeImplemented.! !
+	^ self visitPortfolio: portfolio! !
 
 
-!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:48'!
+!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 12:18:27'!
+addPrefix: aPrefix to: aTree
+
+
+		
+		^ aTree collect: [:aTreeElement | aPrefix append: aTreeElement ]
+		
+		! !
+
+!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 12:20:19'!
 visitPortfolio: aPortfolio
 
-	self shouldBeImplemented.! !
+	|father tree prefix|
+	
+	prefix := ' '.
+	
+	tree := OrderedCollection new.
+	
+	father := accountNames  at: aPortfolio.
+	
+	tree add: father.
+	
+	aPortfolio accountsDo: [:anAccount | tree addAll: 
+		
+		(self addPrefix: prefix to: (anAccount accept: self))
+		
+		].
+	
 
-!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:57'!
+	^ tree! !
+
+!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 11:59:45'!
 visitReceptiveAccount: aReceptiveAccount
 
-	self shouldBeImplemented.! !
+	|tree|
+	
+	tree := OrderedCollection new.
+	
+	tree add: (accountNames at: aReceptiveAccount).
+
+	^ tree.! !
 
 
 !classDefinition: #SummarizingAccount category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1273,7 +1295,6 @@ transactions
 	self subclassResponsibility ! !
 
 
-
 !SummarizingAccount methodsFor: 'visitor acceptance' stamp: 'AD 5/16/2018 16:26:45'!
 accept: aVisitor
 
@@ -1286,7 +1307,6 @@ SummarizingAccount subclass: #Portfolio
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
-
 
 !Portfolio methodsFor: 'testing' stamp: 'HAW 5/8/2018 16:46:26'!
 anyManagedAccountManages: anAccount 
@@ -1338,6 +1358,18 @@ accept: aVisitor
 
 	^ aVisitor visitPortfolio: self! !
 
+
+!Portfolio methodsFor: 'accounts' stamp: 'AD 5/17/2018 12:01:44'!
+accountsDo: aBlock
+	^ accounts collect: [ :anAccount |
+		aBlock value: anAccount ].! !
+
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'AD 5/17/2018 12:02:04'!
+accountsCollect: aBlock
+
+	^ accounts do: [ :anAccount | aBlock value: anAccount ].! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1368,12 +1400,11 @@ accountNotManagedMessageDescription
 	^ 'Account not managed'! !
 
 
-!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:22'!
-check: sourceAccount doesNotManagaAnyOf: aCollectionOfAccounts
-
-	^ aCollectionOfAccounts do: [ :targetAccount | 
-			(sourceAccount = targetAccount) not ifTrue: [ 
-				(sourceAccount manages: targetAccount) ifTrue: [ self error: self accountAlreadyManagedErrorMessage ] ] ]! !
+!Portfolio class methodsFor: 'assertions' stamp: 'AD 5/17/2018 08:31:07'!
+check: sourceAccount doesNotManageAnyOf: aCollectionOfAccounts
+	^ aCollectionOfAccounts do: [ :targetAccount |
+		(sourceAccount = targetAccount) not ifTrue: [
+			(sourceAccount manages: targetAccount) ifTrue: [ self error: self accountAlreadyManagedErrorMessage ]]].! !
 
 !Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:21'!
 checkAccountsAreUnique: aCollectionOfAccounts
@@ -1387,10 +1418,12 @@ checkCreationPreconditions: aCollectionOfAccounts
 	self checkAccountsAreUnique: aCollectionOfAccounts.
 	self checkNoCircularReferencesIn: aCollectionOfAccounts! !
 
-!Portfolio class methodsFor: 'assertions' stamp: 'HernanWilkinson 9/18/2011 17:22'!
+!Portfolio class methodsFor: 'assertions' stamp: 'AD 5/17/2018 08:31:07'!
 checkNoCircularReferencesIn: aCollectionOfAccounts
-
-	aCollectionOfAccounts do: [ :sourceAccount | self check: sourceAccount doesNotManagaAnyOf: aCollectionOfAccounts ]! !
+	aCollectionOfAccounts do: [ :sourceAccount |
+		self
+			check: sourceAccount
+			doesNotManageAnyOf: aCollectionOfAccounts ].! !
 
 
 !classDefinition: #ReceptiveAccount category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1436,7 +1469,6 @@ transactionsDo: aBlock
 	^ transactions do: [:transaction | aBlock value: transaction].! !
 
 
-
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 manages: anAccount
 
@@ -1469,7 +1501,6 @@ initializeFor: aValue with: aTransferWithdraw with: aTransferDeposit
 	value _ aValue .
 	transferWithdraw _ aTransferWithdraw .
 	tranferDeposit _ aTransferDeposit ! !
-
 
 
 !Transfer methodsFor: 'accessing' stamp: 'AD 5/14/2018 17:16:05'!
