@@ -1226,52 +1226,15 @@ value
 	"! !
 
 
-!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 12:18:27'!
-addPrefix: aPrefix to: aTree
-
-
-		
-		^ aTree collect: [:aTreeElement | aPrefix append: aTreeElement ]
-		
-		! !
-
-!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 15:31:01'!
+!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 16:44:50'!
 visitPortfolio: aPortfolio
-"
-	|father tree prefix|
-	
-	prefix := ' '.
-	
-	tree := OrderedCollection new.
-	
-	father := accountNames  at: aPortfolio.
-	
-	tree add: father.
-	
-	aPortfolio accountsDo: [:anAccount | tree addAll: 
-		
-		(self addPrefix: prefix to: (anAccount accept: self))
-		
-		].
-	
 
-	^ tree
-"
 	printedAccounts add: (suffix append: (accountNames at: aPortfolio)).
 	
 	suffix _ suffix append: ' '.! !
 
-!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 15:46:52'!
+!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 16:44:32'!
 visitReceptiveAccount: aReceptiveAccount
-"
-	|tree|
-	
-	tree := OrderedCollection new.
-	
-	tree add: (accountNames at: aReceptiveAccount).
-
-	^ tree.
-"
 
 	printedAccounts add: (suffix append: (accountNames at: aReceptiveAccount)).! !
 
