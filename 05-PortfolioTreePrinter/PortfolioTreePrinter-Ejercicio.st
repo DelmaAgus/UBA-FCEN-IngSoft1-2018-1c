@@ -544,15 +544,15 @@ investmentEarningsOf: anAccount
 investmentNetOf: anAccount
 	^ (AccountInvestmentNetVisitor for: anAccount) value.! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:39:17'!
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/17/2018 15:09:50'!
 portfolioTreeOf: aPortfolio namingAccountWith: aDictionary
-	^ (PortfolioDepthFirstTreePrinterVisitor
+	^ (PorfolioTreePrinterVisitor
 		for: aPortfolio
 		namingAccountsWith: aDictionary) value.! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/16/2018 16:39:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'AD 5/17/2018 15:10:25'!
 reversePortfolioTreeOf: aPortfolio namingAccountWith: aDictionary
-	^ (PorfolioReverseTreePrinterVisitor
+	^ (PortfolioReverseTreePrinterVisitor
 		for: aPortfolio
 		namingAccountsWith: aDictionary) value.! !
 
@@ -639,6 +639,12 @@ affectBalance: aBalance
 accept: aVisitor
 
 	^ aVisitor visitCertificateOfDeposit: self.! !
+
+
+!CertificateOfDeposit methodsFor: 'earnings' stamp: 'AD 5/17/2018 14:43:55'!
+investmentEarnings
+
+	^ value * (tna / 360) * numberOfDays.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -997,10 +1003,10 @@ value
 ! !
 
 
-!AccountInvestmentEarningsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:57:16'!
+!AccountInvestmentEarningsVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 14:44:39'!
 visitCertificateOfDeposit: aCertificateOfDeposit
-
-	^ aCertificateOfDeposit value * (aCertificateOfDeposit tna / 360) * aCertificateOfDeposit numberOfDays.! !
+	
+	^ aCertificateOfDeposit investmentEarnings.! !
 
 !AccountInvestmentEarningsVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:56:42'!
 visitDeposit: aDeposit
@@ -1143,31 +1149,31 @@ visitWithdraw: aWithdraw
 	^ 0.! !
 
 
-!classDefinition: #PorfolioTreePrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
-Object subclass: #PorfolioTreePrinterVisitor
-	instanceVariableNames: 'accountNames portfolio'
+!classDefinition: #PortfolioPrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #PortfolioPrinterVisitor
+	instanceVariableNames: 'accountNames portfolio printedAccounts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:15'!
+!PortfolioPrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:15'!
 visitPortfolio: aPortfolio
 
 	self subclassResponsibility.! !
 
-!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:24'!
+!PortfolioPrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:27:24'!
 visitReceptiveAccount: aReceptiveAccount
 
 	self subclassResponsibility.! !
 
 
-!PorfolioTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:03:13'!
+!PortfolioPrinterVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:03:13'!
 value
 
 	self subclassResponsibility.! !
 
 
-!PorfolioTreePrinterVisitor methodsFor: 'initialization' stamp: 'AD 5/16/2018 17:17:53'!
+!PortfolioPrinterVisitor methodsFor: 'initialization' stamp: 'AD 5/17/2018 15:32:48'!
 initializeFor: aPortfolio namingAccountsWith: aDictionaryOfAccountNames
 
 	accountNames _ aDictionaryOfAccountNames.
@@ -1176,54 +1182,51 @@ initializeFor: aPortfolio namingAccountsWith: aDictionaryOfAccountNames
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'PorfolioTreePrinterVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
-PorfolioTreePrinterVisitor class
+!classDefinition: 'PortfolioPrinterVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
+PortfolioPrinterVisitor class
 	instanceVariableNames: ''!
 
-!PorfolioTreePrinterVisitor class methodsFor: 'instance creation' stamp: 'AD 5/16/2018 16:48:58'!
+!PortfolioPrinterVisitor class methodsFor: 'instance creation' stamp: 'AD 5/16/2018 16:48:58'!
 for: aPortfolio namingAccountsWith: aDictionaryOfAccountNames
  
 	^ self new initializeFor: aPortfolio namingAccountsWith: aDictionaryOfAccountNames! !
 
 
-!classDefinition: #PorfolioReverseTreePrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
-PorfolioTreePrinterVisitor subclass: #PorfolioReverseTreePrinterVisitor
-	instanceVariableNames: ''
+!classDefinition: #PorfolioTreePrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+PortfolioPrinterVisitor subclass: #PorfolioTreePrinterVisitor
+	instanceVariableNames: 'suffix'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!PorfolioReverseTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/16/2018 16:35:00'!
+!PorfolioTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/17/2018 15:32:36'!
 value
+	
+	"portfolio accept: self.
+	
+	^ printedAccounts.
+	"
+	
+	suffix _ ''.
+	
+	printedAccounts _ OrderedCollection new.
+	
+	portfolio accept: self.
+	
+	^ printedAccounts.
+	
+	
+	
+	"printOn: printedAccounts WithSuffix: suffix
 
-	self shouldBeImplemented.! !
-
-
-!PorfolioReverseTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:35:38'!
-visitPortfolio: aPortfolio
-
-	self shouldBeImplemented.! !
-
-!PorfolioReverseTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/16/2018 16:35:56'!
-visitReceptiveAccount: aReceptiveAccount
-
-	self shouldBeImplemented.! !
-
-
-!classDefinition: #PortfolioDepthFirstTreePrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
-PorfolioTreePrinterVisitor subclass: #PortfolioDepthFirstTreePrinterVisitor
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PortfolioTreePrinter-Ejercicio'!
-
-!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/17/2018 09:52:37'!
-value
-
-	^ self visitPortfolio: portfolio! !
+	
+	printedAccounts add: (suffix + accountNames at: self).
+	
+	accounts do: [:account | account printOn: printedAccounts WithSuffix: (suffix + ' ')]
+	"! !
 
 
-!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 12:18:27'!
+!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 12:18:27'!
 addPrefix: aPrefix to: aTree
 
 
@@ -1232,9 +1235,9 @@ addPrefix: aPrefix to: aTree
 		
 		! !
 
-!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 12:20:19'!
+!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 15:31:01'!
 visitPortfolio: aPortfolio
-
+"
 	|father tree prefix|
 	
 	prefix := ' '.
@@ -1252,18 +1255,51 @@ visitPortfolio: aPortfolio
 		].
 	
 
-	^ tree! !
+	^ tree
+"
+	printedAccounts add: (suffix append: (accountNames at: aPortfolio)).
+	
+	suffix _ suffix append: ' '.! !
 
-!PortfolioDepthFirstTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 11:59:45'!
+!PorfolioTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 15:46:52'!
 visitReceptiveAccount: aReceptiveAccount
-
+"
 	|tree|
 	
 	tree := OrderedCollection new.
 	
 	tree add: (accountNames at: aReceptiveAccount).
 
-	^ tree.! !
+	^ tree.
+"
+
+	printedAccounts add: (suffix append: (accountNames at: aReceptiveAccount)).! !
+
+
+!classDefinition: #PortfolioReverseTreePrinterVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+PortfolioPrinterVisitor subclass: #PortfolioReverseTreePrinterVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!PortfolioReverseTreePrinterVisitor methodsFor: 'value' stamp: 'AD 5/17/2018 14:51:57'!
+value
+	
+	portfolio reverseAccept: self.
+	
+	^ printedAccounts.! !
+
+
+!PortfolioReverseTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 14:57:26'!
+visitPortfolio: aPortfolio
+
+	printedAccounts add: (accountNames at: aPortfolio).! !
+
+!PortfolioReverseTreePrinterVisitor methodsFor: 'visiting' stamp: 'AD 5/17/2018 14:57:42'!
+visitReceptiveAccount: aReceptiveAccount
+
+	printedAccounts add: (accountNames at: aReceptiveAccount).! !
 
 
 !classDefinition: #SummarizingAccount category: #'PortfolioTreePrinter-Ejercicio'!
@@ -1297,6 +1333,11 @@ transactions
 
 !SummarizingAccount methodsFor: 'visitor acceptance' stamp: 'AD 5/16/2018 16:26:45'!
 accept: aVisitor
+
+	self subclassResponsibility! !
+
+!SummarizingAccount methodsFor: 'visitor acceptance' stamp: 'AD 5/17/2018 14:55:02'!
+reverseAccept: aVisitor
 
 	self subclassResponsibility! !
 
@@ -1353,22 +1394,32 @@ initializeWithAll: aCollectionOfAccounts
 	accounts := aCollectionOfAccounts   ! !
 
 
-!Portfolio methodsFor: 'visitor acceptance' stamp: 'AD 5/16/2018 16:28:27'!
+!Portfolio methodsFor: 'visitor acceptance' stamp: 'AD 5/17/2018 14:59:27'!
 accept: aVisitor
 
-	^ aVisitor visitPortfolio: self! !
+	aVisitor visitPortfolio: self.
+	
+	accounts do:  [ :account |
+		account accept: aVisitor ].! !
+
+!Portfolio methodsFor: 'visitor acceptance' stamp: 'AD 5/17/2018 14:55:54'!
+reverseAccept: aVisitor
+
+	accounts reverseDo: [ :account |
+		account accept: aVisitor ].
+	
+	aVisitor visitPortfolio: self.! !
 
 
-!Portfolio methodsFor: 'accounts' stamp: 'AD 5/17/2018 12:01:44'!
+!Portfolio methodsFor: 'accounts' stamp: 'AD 5/17/2018 15:26:04'!
 accountsDo: aBlock
-	^ accounts collect: [ :anAccount |
-		aBlock value: anAccount ].! !
 
+	accounts do: [:account | aBlock value: account ]! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'AD 5/17/2018 12:02:04'!
-accountsCollect: aBlock
+!Portfolio methodsFor: 'accounts' stamp: 'AD 5/17/2018 15:26:17'!
+accountsReverseDo: aBlock
 
-	^ accounts do: [ :anAccount | aBlock value: anAccount ].! !
+	accounts reverseDo: [:account | aBlock value: account ]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1484,6 +1535,11 @@ registers: aTtransaction
 
 !ReceptiveAccount methodsFor: 'visitor acceptance' stamp: 'AD 5/16/2018 16:26:18'!
 accept: aVisitor
+
+	^ aVisitor visitReceptiveAccount: self! !
+
+!ReceptiveAccount methodsFor: 'visitor acceptance' stamp: 'AD 5/17/2018 14:56:12'!
+reverseAccept: aVisitor
 
 	^ aVisitor visitReceptiveAccount: self! !
 
