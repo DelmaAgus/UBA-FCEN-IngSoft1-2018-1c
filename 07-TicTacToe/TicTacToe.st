@@ -5,7 +5,7 @@ TestCase subclass: #TicTacToeTest
 	poolDictionaries: ''
 	category: 'TicTacToeStep1'!
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 19:10:48'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 19:10:48'!
 test01
 
 	|game|
@@ -14,7 +14,7 @@ test01
 	self assert: game Xs isEmpty.
 	self assert: game Os isEmpty.! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 19:20:02'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 19:20:02'!
 test02
 
 	|game|
@@ -26,7 +26,7 @@ test02
 	self assert: (game Xs includes: 1@1).
 	self assert: game Os isEmpty.! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 19:36:58'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 19:36:58'!
 test03
 
 	|game|
@@ -40,7 +40,7 @@ test03
 	self assert: 1 equals: game Xs size.
 	self assert: (game Xs includes: 1@1).! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 19:34:03'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 19:34:03'!
 test04
 
 	|game|
@@ -60,7 +60,7 @@ test04
 		].
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 19:35:56'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 19:35:56'!
 test05
 
 	|game|
@@ -83,7 +83,7 @@ test05
 		].
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 20:15:41'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 20:15:41'!
 test06
 
 	|game|
@@ -104,7 +104,7 @@ test06
 		].
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 19:58:00'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 19:58:00'!
 test07
 
 	|game|
@@ -127,7 +127,7 @@ test07
 		].
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 20:02:51'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 20:02:51'!
 test08
 
 	|game|
@@ -147,7 +147,7 @@ test08
 		].
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 20:16:39'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 20:16:39'!
 test09
 
 	|game|
@@ -171,7 +171,7 @@ test09
 		].
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 20:35:40'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 20:35:40'!
 test10
 
 	|game|
@@ -187,7 +187,7 @@ test10
 	self deny: game XHasWon.
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 20:34:50'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 20:34:50'!
 test11
 
 	|game|
@@ -203,7 +203,7 @@ test11
 	self assert: game XHasWon.
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 20:36:10'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 20:36:10'!
 test12
 
 	|game|
@@ -219,7 +219,7 @@ test12
 	self assert: game XHasWon.
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 20:36:30'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 20:36:30'!
 test13
 
 	|game|
@@ -235,7 +235,7 @@ test13
 	self assert: game XHasWon.
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 21:01:31'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 21:01:31'!
 test14
 
 	|game|
@@ -251,7 +251,7 @@ test14
 	self assert: game XHasWon.
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 21:02:11'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 21:02:11'!
 test15
 
 	|game|
@@ -267,7 +267,7 @@ test15
 	self assert: game XHasWon.
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 21:18:53'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 21:18:53'!
 test16
 
 	|game|
@@ -284,7 +284,7 @@ test16
 	self deny: game XHasWon.
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 21:20:58'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 21:20:58'!
 test17
 
 	|game|
@@ -301,7 +301,7 @@ test17
 	self deny: game XHasWon.
 ! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 21:26:02'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 21:26:02'!
 test18
 
 	|game|
@@ -323,7 +323,31 @@ test18
 		].
 		! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 21:44:55'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/27/2018 23:05:15'!
+test19
+
+	| game |
+	
+	game := TicTacToe new.
+	
+	game putXAt: 2@2.
+	game putOAt: 1@1.	
+	game putXAt: 2@1.
+	game putOAt: 1@2.
+	game putXAt: 3@1.	
+	game putOAt: 1@3.
+
+	self 
+		should: [ game putXAt: 3@2 ]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError |
+			self assert: TicTacToe canNotPlayWhenGameIsOverErrorMessage equals: anError messageText.
+			self assert: 3 equals: game Xs size.
+			self assert: (game Xs includes: 2@2).
+			self assert: (game Xs includes: 2@1).
+			self assert: (game Xs includes: 3@1) ]! !
+
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 21:44:55'!
 test20
 
 	|game|
@@ -345,7 +369,7 @@ test20
 	self assert: game isTied.
 	! !
 
-!TicTacToeTest methodsFor: 'as yet unclassified' stamp: 'AD 5/24/2018 21:45:29'!
+!TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/24/2018 21:45:29'!
 test21
 
 	|game|
@@ -411,14 +435,6 @@ hasCompletedColumn: aSetOfPositions
 		
 		^ (1 to: 3) anySatisfy: [:y | (aSetOfPositions count:  [:posicion | posicion y=y]) = 3]! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/24/2018 21:17:54'!
-hasCompletedDiagonal: aSetOfPositions
-		
-		^ ((aSetOfPositions includes: 1@1) and: (aSetOfPositions includes: 2@2) and: (aSetOfPositions includes: 3@3))
-			or: ((aSetOfPositions includes: 3@1) and: (aSetOfPositions includes: 2@2) and: (aSetOfPositions includes: 1@3)).
-			
-			"^(1 to: 3) allSatisfy: [self]"! !
-
 !TicTacToe methodsFor: 'testing' stamp: 'AD 5/24/2018 21:19:48'!
 hasCompletedDownDiagonal: positions
 	
@@ -429,49 +445,52 @@ hasCompletedRow: aSetOfPositions
 		
 		^ (1 to: 3) anySatisfy: [:x | (aSetOfPositions count:  [:posicion | posicion x=x]) = 3]! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/24/2018 21:30:27'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/27/2018 23:13:24'!
 hasCompletedUpDiagonal: positions
 	
-	^ (positions includes: 2@2) and: (positions includes: 1@3) and: (positions includes: 3@1).! !
+	^(1 to: 3) allSatisfy: [ :n | positions includes: n@(4-n) ]! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/24/2018 21:29:34'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/27/2018 23:14:15'!
 hasWin: positions
 		
-		^ (self hasCompletedRow: positions) or: (self hasCompletedColumn: positions) or: (self hasCompletedDownDiagonal: positions) or: (self hasCompletedDownDiagonal: positions).! !
+			^(self hasCompletedRow: positions)
+		or: [(self hasCompletedColumn: positions) 
+				or: [(self hasCompletedDownDiagonal: positions)
+					or: [(self hasCompletedUpDiagonal: positions)]]]! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/24/2018 21:31:22'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/27/2018 23:15:28'!
 isGameOver
 	
-	^ winner = #x or: [winner = #o]! !
+	^winner = #x or: [ winner = #o ]! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/24/2018 21:35:45'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/27/2018 23:16:47'!
 isOver
 	
-	^ (self isGameOver) or: [self isTied].! !
+	^ self XHasWon or: [ self OHasWon or: [ self isTied ]]! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/24/2018 21:39:51'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/27/2018 23:17:04'!
 isTied
 	
-	^ xs size = 5 and: [os size = 4 and: [self XHasWon not]]! !
+	^xs size = 5 and: [ os size = 4 and: [ self XHasWon not ]] " and: [ self YHasWon not ]]]"! !
 
 
-!TicTacToe methodsFor: 'game' stamp: 'AD 5/24/2018 21:42:34'!
+!TicTacToe methodsFor: 'game' stamp: 'AD 5/27/2018 23:18:53'!
 putOAt: aPosition
-	
+
+	(self isOver ) ifTrue: [self error: self class canNotPlayWhenGameIsOverErrorMessage].	
 	self checkIsTurnOfO.
 	self checkIsOccupied: aPosition.
-	(self isOver ) ifTrue: [self error: self class canNotPlayWhenGameIsOverErrorMessage].
 	os add: aPosition.
 	(self hasWin: os) ifTrue: [winner := #o].
 	turn := #x
 	! !
 
-!TicTacToe methodsFor: 'game' stamp: 'AD 5/24/2018 21:42:28'!
+!TicTacToe methodsFor: 'game' stamp: 'AD 5/27/2018 23:18:28'!
 putXAt: aPosition
 	
+	(self isOver ) ifTrue: [self error: self class canNotPlayWhenGameIsOverErrorMessage].
 	self checkIsTurnOfX.
 	self checkIsOccupied: aPosition.
-	(self isOver ) ifTrue: [self error: self class canNotPlayWhenGameIsOverErrorMessage].
 	xs add: aPosition.
 	(self hasWin: xs) ifTrue: [winner := #x].
 	turn := #o.! !
