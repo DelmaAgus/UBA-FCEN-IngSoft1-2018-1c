@@ -1,9 +1,9 @@
-!classDefinition: #TicTacToeTest category: #TicTacToe!
+!classDefinition: #TicTacToeTest category: #TicTacToeStep1!
 TestCase subclass: #TicTacToeTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'TicTacToe'!
+	category: 'TicTacToeStep1'!
 
 !TicTacToeTest methodsFor: 'tests' stamp: 'AD 5/31/2018 12:15:12'!
 test01ANewGameIsEmpty
@@ -203,12 +203,12 @@ test21APlayerCanWinWhenThereIsOnlyOnePositionAvailable
 	self deny: game isTied.! !
 
 
-!classDefinition: #TicTacToe category: #TicTacToe!
+!classDefinition: #TicTacToe category: #TicTacToeStep1!
 Object subclass: #TicTacToe
 	instanceVariableNames: 'os xs winner state'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'TicTacToe'!
+	category: 'TicTacToeStep1'!
 
 !TicTacToe methodsFor: 'initialization' stamp: 'AD 5/30/2018 14:05:45'!
 initialize
@@ -219,133 +219,120 @@ initialize
 ! !
 
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:22:06'!
-hasAllPositionsTaken
-	^ self amountOfPositionsMarkedWithX = 5.! !
-
 !TicTacToe methodsFor: 'testing' stamp: 'AD 5/30/2018 14:43:33'!
 hasCompletedColumn: aPlayersMarkedPositions
 		
 		^ (1 to: 3) anySatisfy: [:y | (aPlayersMarkedPositions count:  [:position | position y = y]) = 3]! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:31:20'!
-hasCompletedDownDiagonal: aPlayersMarkedPositions
-
-	^(1 to: 3) allSatisfy: [:n | aPlayersMarkedPositions includes: n@n]! !
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/24/2018 21:19:48'!
+hasCompletedDownDiagonal: positions
+	
+	^(1 to: 3) allSatisfy: [:n | positions includes: n@n]! !
 
 !TicTacToe methodsFor: 'testing' stamp: 'AD 5/28/2018 20:51:28'!
 hasCompletedRow: aPlayersMarkedPositions
 		
 		^ (1 to: 3) anySatisfy: [:x | (aPlayersMarkedPositions count:  [:position | position x = x]) = 3]! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:31:33'!
-hasCompletedUpDiagonal: aPlayersMarkedPositions
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/27/2018 23:13:24'!
+hasCompletedUpDiagonal: positions
+	
+	^(1 to: 3) allSatisfy: [ :n | positions includes: n@(4-n) ]! !
 
-	^(1 to: 3) allSatisfy: [ :n | aPlayersMarkedPositions includes: n@(4-n) ]! !
-
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:21:17'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/28/2018 21:19:03'!
 hasPlayerOMarkedAt: aPosition
 
 	^ os includes: aPosition.! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:19:37'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/30/2018 14:10:56'!
 hasPlayerOWon
 
-	^ state hasPlayerOWonIn: self.! !
+	^ self hasWinningPositions: os.! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:19:44'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/28/2018 21:19:20'!
 hasPlayerXMarkedAt: aPosition
 
 	^ xs includes: aPosition.! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:19:50'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/30/2018 14:10:49'!
 hasPlayerXWon
-	^ state hasPlayerXWonIn: self.! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:19:57'!
+	^ self hasWinningPositions: xs.! !
+
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 12:13:52'!
 hasPositionsMarkedWithO
-
 	^ self amountOfPositionsMarkedWithO > 0.! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:20:03'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 12:15:04'!
 hasPositionsMarkedWithX
-
 	^ self amountOfPositionsMarkedWithX > 0.! !
 
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:20:16'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 12:41:45'!
 hasWinner
+	^ self hasPlayerXWon or: [ self hasPlayerOWon ].! !
 
-	^ self OhasWinningPositions or: [ self XhasWinningPositions ].! !
-
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:20:30'!
-isOver
-
-	^ state isOver: self.! !
-
-!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 14:20:35'!
-isTied
-
-	^ state isTied: self! !
-
-
-!TicTacToe methodsFor: 'game' stamp: 'AD 5/31/2018 14:06:11'!
-markWithOAt: aPosition
-	self assertIsValid: aPosition.
-	state
-		markWithOAt: aPosition
-		On: self.! !
-
-!TicTacToe methodsFor: 'game' stamp: 'AD 5/31/2018 14:06:11'!
-markWithXAt: aPosition
-	self assertIsValid: aPosition.
-	state
-		markWithXAt: aPosition
-		On: self.! !
-
-
-!TicTacToe methodsFor: 'asserting' stamp: 'AD 5/31/2018 14:18:59'!
-assertIsAvailable: aPosition
-
-	((self hasPlayerXMarkedAt: aPosition) or: [self hasPlayerOMarkedAt: aPosition]) ifTrue: [ ^ self error: self class positionTakenErrorMessage ].! !
-
-!TicTacToe methodsFor: 'asserting' stamp: 'AD 5/31/2018 14:06:11'!
-assertIsValid: aPosition
-	(aPosition
-		between: 1 @ 1
-		and: 3 @ 3) ifFalse: [ self error: self class invalidPositionErrorMessage ].! !
-
-
-!TicTacToe methodsFor: 'private' stamp: 'AD 5/31/2018 14:09:41'!
-OhasWinningPositions
-	
-	^ self hasWinningPositions: os! !
-
-!TicTacToe methodsFor: 'private' stamp: 'AD 5/31/2018 14:09:50'!
-XhasWinningPositions
-	
-	^ self hasWinningPositions: xs! !
-
-!TicTacToe methodsFor: 'private' stamp: 'AD 5/31/2018 13:35:43'!
-changeStateTo: aState
-
-	state _ aState.! !
-
-!TicTacToe methodsFor: 'private' stamp: 'AD 5/31/2018 14:18:31'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/30/2018 14:10:21'!
 hasWinningPositions: positions
 
 	^ (self hasCompletedRow: positions) or: [
 		(self hasCompletedColumn: positions) or: [
 			(self hasCompletedDownDiagonal: positions) or: [ self hasCompletedUpDiagonal: positions ]]].! !
 
-!TicTacToe methodsFor: 'private' stamp: 'AD 5/31/2018 14:18:22'!
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 12:41:45'!
+isOver
+	^ self hasWinner or: [ self isTied ].! !
+
+!TicTacToe methodsFor: 'testing' stamp: 'AD 5/31/2018 12:11:17'!
+isTied
+	^ xs size = 5 and: [
+		os size = 4 and: [ self hasPlayerXWon not ]].! !
+
+
+!TicTacToe methodsFor: 'game' stamp: 'AD 5/31/2018 12:19:53'!
+markWithOAt: aPosition
+
+	self assertGameIsNotOver.
+	self assertIsValidPosition: aPosition.
+	
+	state markWithOAt: aPosition On: self.! !
+
+!TicTacToe methodsFor: 'game' stamp: 'AD 5/31/2018 12:19:40'!
+markWithXAt: aPosition
+
+	self assertGameIsNotOver.
+	self assertIsValidPosition: aPosition.
+	
+	state markWithXAt: aPosition On: self.! !
+
+
+!TicTacToe methodsFor: 'asserting' stamp: 'AD 5/31/2018 12:10:57'!
+assertGameIsNotOver
+	self isOver ifTrue: [ self error: self class canNotPlayWhenGameIsOverErrorMessage ].! !
+
+!TicTacToe methodsFor: 'asserting' stamp: 'AD 5/30/2018 14:57:33'!
+assertIsAvailable: aPosition
+
+	((self hasPlayerXMarkedAt: aPosition) or: [self hasPlayerOMarkedAt: aPosition]) ifTrue: [ ^ self error: self class positionTakenErrorMessage ].! !
+
+!TicTacToe methodsFor: 'asserting' stamp: 'AD 5/28/2018 21:06:20'!
+assertIsValidPosition: aPosition 
+	
+	(aPosition between: 1@1 and: 3@3) ifFalse: [self error: self class invalidPositionErrorMessage ] ! !
+
+
+!TicTacToe methodsFor: 'private' stamp: 'AD 5/30/2018 14:06:12'!
 safeMarkWithOAt: aPosition 
+	
+	os add: aPosition.
+	
+	state _ PlayerXTurn new.! !
 
-	os add: aPosition.! !
-
-!TicTacToe methodsFor: 'private' stamp: 'AD 5/31/2018 14:18:16'!
+!TicTacToe methodsFor: 'private' stamp: 'AD 5/30/2018 14:06:18'!
 safeMarkWithXAt: aPosition 
-
-	xs add: aPosition.! !
+	
+	xs add: aPosition.
+	
+	state _ PlayerOTurn new.! !
 
 
 !TicTacToe methodsFor: 'size' stamp: 'AD 5/31/2018 12:32:19'!
@@ -360,14 +347,14 @@ amountOfPositionsMarkedWithX
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TicTacToe class' category: #TicTacToe!
+!classDefinition: 'TicTacToe class' category: #TicTacToeStep1!
 TicTacToe class
 	instanceVariableNames: ''!
 
-!TicTacToe class methodsFor: 'error messages' stamp: 'AD 5/31/2018 12:50:51'!
+!TicTacToe class methodsFor: 'error messages' stamp: 'AD 5/24/2018 21:26:33'!
 canNotPlayWhenGameIsOverErrorMessage
 
-	^ 'The game has finished'! !
+	^ 'the game has finished'! !
 
 !TicTacToe class methodsFor: 'error messages' stamp: 'AD 5/28/2018 21:05:39'!
 invalidPositionErrorMessage
@@ -385,12 +372,12 @@ positionTakenErrorMessage
 	^ 'Positon already taken'! !
 
 
-!classDefinition: #TicTacToeState category: #TicTacToe!
+!classDefinition: #TicTacToeState category: #TicTacToeStep1!
 Object subclass: #TicTacToeState
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'TicTacToe'!
+	category: 'TicTacToeStep1'!
 
 !TicTacToeState methodsFor: 'marking positions' stamp: 'AD 5/30/2018 14:00:03'!
 markWithOAt: aPosition On: aTicTacToeMatch
@@ -403,51 +390,14 @@ markWithXAt: aPosition On: aTicTacToeMatch
 	self subclassResponsibility ! !
 
 
-!TicTacToeState methodsFor: 'error signals' stamp: 'AD 5/31/2018 12:51:14'!
-signalCanNotPlayWhenGameIsOver
-
-	self error: TicTacToe canNotPlayWhenGameIsOverErrorMessage.! !
-
 !TicTacToeState methodsFor: 'error signals' stamp: 'AD 5/31/2018 12:25:00'!
 signalPlayerCantMarkTwiceInARow
 
 	self error: TicTacToe playerCantMarkTwiceErrorMessage.! !
 
-
-!TicTacToeState methodsFor: 'testing' stamp: 'AD 5/31/2018 13:31:22'!
-hasPlayerOWonIn: aTictacToeGame
-
-	self subclassResponsibility.! !
-
-!TicTacToeState methodsFor: 'testing' stamp: 'AD 5/31/2018 13:31:33'!
-hasPlayerXWonIn: aTictacToeGame
-
-	self subclassResponsibility.! !
-
-!TicTacToeState methodsFor: 'testing' stamp: 'AD 5/31/2018 13:29:30'!
-isOver: aTictacToeGame
-
-	self subclassResponsibility.! !
-
-!TicTacToeState methodsFor: 'testing' stamp: 'AD 5/31/2018 13:31:11'!
-isTied: aTictacToeGame
-
-	self subclassResponsibility.! !
-
-
-!TicTacToeState methodsFor: 'states' stamp: 'AD 5/31/2018 13:36:42'!
-changeStateIn: aTicTacToeGame
-
-	aTicTacToeGame changeStateTo: (self nextStateFor: aTicTacToeGame)! !
-
-!TicTacToeState methodsFor: 'states' stamp: 'AD 5/31/2018 13:33:44'!
-nextStateFor: aTicTacToeGame
-
-	self subclassResponsibility.! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TicTacToeState class' category: #TicTacToe!
+!classDefinition: 'TicTacToeState class' category: #TicTacToeStep1!
 TicTacToeState class
 	instanceVariableNames: 'uniqueInstance'!
 
@@ -465,152 +415,41 @@ uniqueInstance
 	^ uniqueInstance! !
 
 
-!classDefinition: #GameOver category: #TicTacToe!
-TicTacToeState subclass: #GameOver
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'TicTacToe'!
-
-!GameOver methodsFor: 'marking positions' stamp: 'AD 5/31/2018 12:51:29'!
-markWithOAt: aPosition On: aTicTacToeMatch
-
-	self signalCanNotPlayWhenGameIsOver.! !
-
-!GameOver methodsFor: 'marking positions' stamp: 'AD 5/31/2018 12:51:35'!
-markWithXAt: aPosition On: aTicTacToeMatch
-
-	self signalCanNotPlayWhenGameIsOver.! !
-
-
-!GameOver methodsFor: 'testing' stamp: 'AD 5/31/2018 14:11:47'!
-hasPlayerOWonIn: aTicTacToeGame
-
-	^ aTicTacToeGame OhasWinningPositions.! !
-
-!GameOver methodsFor: 'testing' stamp: 'AD 5/31/2018 14:11:54'!
-hasPlayerXWonIn: aTicTacToeGame
-
-	^ aTicTacToeGame XhasWinningPositions.! !
-
-!GameOver methodsFor: 'testing' stamp: 'AD 5/31/2018 13:30:40'!
-isOver: aTicTacToeGame
-
-	^ true! !
-
-!GameOver methodsFor: 'testing' stamp: 'AD 5/31/2018 14:23:22'!
-isTied: aTictacToeGame
-
-	^ aTictacToeGame hasAllPositionsTaken
-		and: [
-			aTictacToeGame XhasWinningPositions not ].! !
-
-
-!GameOver methodsFor: 'states' stamp: 'AD 5/31/2018 13:33:55'!
-nextStateFor: aTicTacToeGame
-
-	^ self! !
-
-
-!classDefinition: #PlayerOTurn category: #TicTacToe!
+!classDefinition: #PlayerOTurn category: #TicTacToeStep1!
 TicTacToeState subclass: #PlayerOTurn
-	instanceVariableNames: ''
+	instanceVariableNames: 'uniqueInstance'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'TicTacToe'!
+	category: 'TicTacToeStep1'!
 
-!PlayerOTurn methodsFor: 'marking positions' stamp: 'AD 5/31/2018 13:37:26'!
+!PlayerOTurn methodsFor: 'marking positions' stamp: 'AD 5/31/2018 12:21:05'!
 markWithOAt: aPosition On: aTicTacToeMatch
 
 	aTicTacToeMatch assertIsAvailable: aPosition.
 	
-	aTicTacToeMatch safeMarkWithOAt: aPosition.
-	
-	self changeStateIn: aTicTacToeMatch.! !
+	aTicTacToeMatch safeMarkWithOAt: aPosition.! !
 
 !PlayerOTurn methodsFor: 'marking positions' stamp: 'AD 5/31/2018 12:25:37'!
 markWithXAt: aPosition On: aTicTacToeMatch
 
 	self signalPlayerCantMarkTwiceInARow! !
 
-
-!PlayerOTurn methodsFor: 'testing' stamp: 'AD 5/31/2018 13:31:58'!
-hasPlayerOWonIn: aTictacToeGame
-
-	^ false! !
-
-!PlayerOTurn methodsFor: 'testing' stamp: 'AD 5/31/2018 13:32:03'!
-hasPlayerXWonIn: aTictacToeGame
-
-	^ false! !
-
-!PlayerOTurn methodsFor: 'testing' stamp: 'AD 5/31/2018 13:29:58'!
-isOver: aTictacToeGame
-
-	^ false! !
-
-!PlayerOTurn methodsFor: 'testing' stamp: 'AD 5/31/2018 13:30:15'!
-isTied: aTictacToeGame
-
-	^ false! !
-
-
-!PlayerOTurn methodsFor: 'states' stamp: 'AD 5/31/2018 14:27:58'!
-nextStateFor: aTicTacToeGame
-
-	(aTicTacToeGame hasWinner or: [ aTicTacToeGame hasAllPositionsTaken ])
-		ifTrue: [ ^ GameOver new ].
-		
-	^ PlayerXTurn new.! !
-
 
-!classDefinition: #PlayerXTurn category: #TicTacToe!
+!classDefinition: #PlayerXTurn category: #TicTacToeStep1!
 TicTacToeState subclass: #PlayerXTurn
-	instanceVariableNames: ''
+	instanceVariableNames: 'uniqueInstance'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'TicTacToe'!
+	category: 'TicTacToeStep1'!
 
 !PlayerXTurn methodsFor: 'marking positions' stamp: 'AD 5/31/2018 12:25:48'!
 markWithOAt: aPosition On: aTicTacToeMatch
 
 	self signalPlayerCantMarkTwiceInARow! !
 
-!PlayerXTurn methodsFor: 'marking positions' stamp: 'AD 5/31/2018 13:37:39'!
+!PlayerXTurn methodsFor: 'marking positions' stamp: 'AD 5/31/2018 12:21:57'!
 markWithXAt: aPosition On: aTicTacToeMatch
 
 	aTicTacToeMatch assertIsAvailable: aPosition.
 	
-	aTicTacToeMatch safeMarkWithXAt: aPosition.	
-	
-	self changeStateIn: aTicTacToeMatch.! !
-
-
-!PlayerXTurn methodsFor: 'testing' stamp: 'AD 5/31/2018 13:32:15'!
-hasPlayerOWonIn: aTictacToeGame
-
-	^ false! !
-
-!PlayerXTurn methodsFor: 'testing' stamp: 'AD 5/31/2018 13:32:18'!
-hasPlayerXWonIn: aTictacToeGame
-
-	^ false! !
-
-!PlayerXTurn methodsFor: 'testing' stamp: 'AD 5/31/2018 13:29:47'!
-isOver: aTictacToeGame
-
-	^ false! !
-
-!PlayerXTurn methodsFor: 'testing' stamp: 'AD 5/31/2018 13:31:01'!
-isTied: aTictacToeGame
-
-	^ false! !
-
-
-!PlayerXTurn methodsFor: 'states' stamp: 'AD 5/31/2018 14:27:38'!
-nextStateFor: aTicTacToeGame
-
-	(aTicTacToeGame hasWinner or: [ aTicTacToeGame hasAllPositionsTaken ])
-		ifTrue: [ ^ GameOver new ].
-		
-	^ PlayerOTurn new.! !
+	aTicTacToeMatch safeMarkWithXAt: aPosition.	! !
