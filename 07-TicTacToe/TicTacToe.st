@@ -397,10 +397,21 @@ markWithXAt: aPosition On: aTicTacToeMatch
 
 	self subclassResponsibility ! !
 
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TicTacToeState class' category: #TicTacToeStep1!
+TicTacToeState class
+	instanceVariableNames: ''!
+
+!TicTacToeState class methodsFor: 'instance creation' stamp: 'AD 5/31/2018 10:35:24'!
+new
+
+	self subclassResponsibility! !
+
 
 !classDefinition: #PlayerOTurn category: #TicTacToeStep1!
 TicTacToeState subclass: #PlayerOTurn
-	instanceVariableNames: ''
+	instanceVariableNames: 'uniqueInstance'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TicTacToeStep1'!
@@ -418,10 +429,23 @@ markWithXAt: aPosition On: aTicTacToeMatch
 
 	self error: aTicTacToeMatch class playerCantMarkTwiceErrorMessage.! !
 
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PlayerOTurn class' category: #TicTacToeStep1!
+PlayerOTurn class
+	instanceVariableNames: 'uniqueInstance'!
+
+!PlayerOTurn class methodsFor: 'instance creation' stamp: 'AD 5/31/2018 10:34:17'!
+new
+	
+	uniqueInstance ifNil:[uniqueInstance := self basicNew].
+	
+	^ uniqueInstance ! !
+
 
 !classDefinition: #PlayerXTurn category: #TicTacToeStep1!
 TicTacToeState subclass: #PlayerXTurn
-	instanceVariableNames: ''
+	instanceVariableNames: 'uniqueInstance'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TicTacToeStep1'!
@@ -440,3 +464,16 @@ markWithXAt: aPosition On: aTicTacToeMatch
 	aTicTacToeMatch safeMarkWithXAt: aPosition.
 	
 	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PlayerXTurn class' category: #TicTacToeStep1!
+PlayerXTurn class
+	instanceVariableNames: 'uniqueInstance'!
+
+!PlayerXTurn class methodsFor: 'instance creation' stamp: 'AD 5/31/2018 10:34:36'!
+new
+	
+	uniqueInstance ifNil:[uniqueInstance := self basicNew].
+	
+	^ uniqueInstance! !
