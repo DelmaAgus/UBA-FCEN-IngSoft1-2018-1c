@@ -5,11 +5,11 @@ TestCase subclass: #TicTacToeConsoleTest
 	poolDictionaries: ''
 	category: 'TicTacToe'!
 
-!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 5/31/2018 19:54:57'!
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:48:04'!
 test01
 
-
 	| console game |
+	
 	console _ TicTacToeConsole new.
 	
 	game _ TicTacToe new addListener: console.
@@ -19,9 +19,8 @@ test01
 	self assert: (console log at: 1) equals: 'X marcó en 2@2'.
 	self assert: (console log at: 2) equals: 'Estado: Jugando O'.! !
 
-!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 5/31/2018 19:55:20'!
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:48:25'!
 test02
-
 
 	| console game |
 	console _ TicTacToeConsole new.
@@ -36,18 +35,13 @@ test02
 	self assert: (console log at: 3) equals: 'O marcó en 1@1'.
 	self assert: (console log at: 4) equals: 'Estado: Jugando X'.! !
 
-!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 5/31/2018 19:55:32'!
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:50:09'!
 test03
 
-
 	| console game |
-	console _ TicTacToeConsole new.
-	
-	game _ TicTacToe new addListener: console.
-	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	game markWithXAt: 1@3.
+	console _ TicTacToeConsole new.	
+	game _ TicTacToe new addListener: console.	
+	game markAll: { 2@2. 1@1. 1@3.}.
 	
 	self assert: (console log at: 1) equals: 'X marcó en 2@2'.
 	self assert: (console log at: 2) equals: 'Estado: Jugando O'.
@@ -56,20 +50,13 @@ test03
 	self assert: (console log at: 5) equals: 'X marcó en 1@3'.
 	self assert: (console log at: 6) equals: 'Estado: Jugando O'.! !
 
-!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 5/31/2018 20:01:09'!
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:49:36'!
 test04
 
-
 	| console game |
-	console _ TicTacToeConsole new.
-	
-	game _ TicTacToe new addListener: console.
-	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	game markWithXAt: 1@3.
-	game markWithOAt: 1@2.
-	game markWithXAt: 3@1.
+	console _ TicTacToeConsole new.	
+	game _ TicTacToe new addListener: console.	
+	game markAll: { 2@2. 1@1. 1@3. 1@2. 3@1.}.
 	
 	self assert: (console log at: 1) equals: 'X marcó en 2@2'.
 	self assert: (console log at: 2) equals: 'Estado: Jugando O'.
@@ -82,21 +69,16 @@ test04
 	self assert: (console log at: 9) equals: 'X marcó en 3@1'.
 	self assert: (console log at: 10) equals: 'Estado: Juego terminado - Ganó X!!'.! !
 
-!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 5/31/2018 20:31:32'!
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:40:18'!
 test05
 
-
 	| console game |
+	
 	console _ TicTacToeConsole new.
 	
 	game _ TicTacToe new addListener: console.
 	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
-	game markWithXAt: 1@2.
-	game markWithOAt: 2@1.
-	game markWithXAt: 3@3.
-	game markWithOAt: 3@1.
+	game markAll: { 2@2. 1@1. 1@2. 2@1. 3@3. 3@1.}.
 	
 	self assert: (console log at: 1) equals: 'X marcó en 2@2'.
 	self assert: (console log at: 2) equals: 'Estado: Jugando O'.
@@ -106,14 +88,13 @@ test05
 	self assert: (console log at: 6) equals: 'Estado: Jugando O'.
 	self assert: (console log at: 7) equals: 'O marcó en 2@1'.
 	self assert: (console log at: 8) equals: 'Estado: Jugando X'.
-	self assert: (console log at: 9) equals: 'X marcó en 3@3'.
-	self assert: (console log at: 10) equals: 'Estado: Jugando O'.
+	self assert: (console log at: 9) equals: 'X marcó en 3@3'.	self assert: (console log at: 10) equals: 'Estado: Jugando O'.
 	self assert: (console log at: 11) equals: 'O marcó en 3@1'.
-	self assert: (console log at: 12) equals: 'Estado: Juego terminado - Ganó O!!'.! !
+	self assert: (console log at: 12) equals: 'Estado: Juego terminado - Ganó O!!'.
+	! !
 
-!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 5/31/2018 20:35:28'!
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:44:25'!
 test06
-
 
 	| console game |
 	console _ TicTacToeConsole new.
@@ -142,11 +123,11 @@ test06
 	self assert: (console log at: 18) equals: 'Estado: Juego terminado - Empate!!'.
 ! !
 
-!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 5/31/2018 21:00:59'!
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:40:56'!
 test07
 
-
 	| visualizer game boardView |
+	
 	visualizer _ TicTacToeVisualizer new.
 	
 	game _ TicTacToe new addListener: visualizer.
@@ -162,17 +143,16 @@ test07
 	self assert: (boardView at: 5) equals: ' | | '.
 	self assert: (boardView at: 6) equals: 'Playing O'.! !
 
-!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 5/31/2018 21:09:08'!
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:38:47'!
 test08
 
-
 	| visualizer game boardView |
+	
 	visualizer _ TicTacToeVisualizer new.
 	
 	game _ TicTacToe new addListener: visualizer.
 	
-	game markWithXAt: 2@2.
-	game markWithOAt: 1@1.
+	game markAll: { 2@2. 1@1.}.
 	
 	boardView _ visualizer view.
 	
@@ -182,6 +162,86 @@ test08
 	self assert: (boardView at: 4) equals: '-----'.
 	self assert: (boardView at: 5) equals: 'O| | '.
 	self assert: (boardView at: 6) equals: 'Playing X'.! !
+
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:41:38'!
+test09
+
+	| visualizer game boardView |
+	
+	visualizer _ TicTacToeVisualizer new.
+	
+	game _ TicTacToe new addListener: visualizer.
+	
+	game markAll: { 2@2. 1@1. 1@3.}.
+	
+	boardView _ visualizer view.
+	
+	self assert: (boardView at: 1) equals: 'X| | '.
+	self assert: (boardView at: 2) equals: '-----'.
+	self assert: (boardView at: 3) equals: ' |X| '.
+	self assert: (boardView at: 4) equals: '-----'.
+	self assert: (boardView at: 5) equals: 'O| | '.
+	self assert: (boardView at: 6) equals: 'Playing O'.! !
+
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:41:47'!
+test10
+
+	| visualizer game boardView |
+	
+	visualizer _ TicTacToeVisualizer new.
+	
+	game _ TicTacToe new addListener: visualizer.
+	
+	game markAll: { 2@2. 1@1. 1@3. 1@2. 3@1 }.
+	
+	boardView _ visualizer view.
+	
+	self assert: (boardView at: 1) equals: 'X| | '.
+	self assert: (boardView at: 2) equals: '-----'.
+	self assert: (boardView at: 3) equals: 'O|X| '.
+	self assert: (boardView at: 4) equals: '-----'.
+	self assert: (boardView at: 5) equals: 'O| |X'.
+	self assert: (boardView at: 6) equals: 'X Won!!'.! !
+
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:43:39'!
+test11
+
+	| visualizer game boardView |
+	
+	visualizer _ TicTacToeVisualizer new.
+	
+	game _ TicTacToe new addListener: visualizer.
+	
+	game markAll: { 2@2. 1@1. 1@2. 2@1. 3@3. 3@1.}.
+	
+	boardView _ visualizer view.
+	
+	self assert: (boardView at: 1) equals: ' | |X'.
+	self assert: (boardView at: 2) equals: '-----'.
+	self assert: (boardView at: 3) equals: 'X|X| '.
+	self assert: (boardView at: 4) equals: '-----'.
+	self assert: (boardView at: 5) equals: 'O|O|O'.
+	self assert: (boardView at: 6) equals: 'O Won!!'.! !
+
+!TicTacToeConsoleTest methodsFor: 'tests' stamp: 'AD 6/3/2018 17:46:20'!
+test12
+
+	| visualizer game boardView |
+	
+	visualizer _ TicTacToeVisualizer new.
+	
+	game _ TicTacToe new addListener: visualizer.
+	
+	game markAll: { 2@2. 1@1. 1@3. 3@1. 2@1. 2@3. 1@2. 3@2. 3@3 }.
+	
+	boardView _ visualizer view.
+	
+	self assert: (boardView at: 1) equals: 'X|O|X'.
+	self assert: (boardView at: 2) equals: '-----'.
+	self assert: (boardView at: 3) equals: 'X|X|O'.
+	self assert: (boardView at: 4) equals: '-----'.
+	self assert: (boardView at: 5) equals: 'O|X|O'.
+	self assert: (boardView at: 6) equals: 'Game Tied!!'.! !
 
 
 !classDefinition: #TicTacToeTest category: #TicTacToe!
@@ -1158,58 +1218,97 @@ markWithXAt: aPosition
 
 !classDefinition: #TicTacToeVisualizer category: #TicTacToe!
 Object subclass: #TicTacToeVisualizer
-	instanceVariableNames: 'board markedPositions'
+	instanceVariableNames: 'markedPositions state'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TicTacToe'!
 
-!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 5/31/2018 20:58:44'!
+!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 6/3/2018 17:46:49'!
+gameTied
+	
+	state _ 'Game Tied!!'! !
+
+!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 6/3/2018 16:57:43'!
 playerOTurn
 	
+	state _ 'Playing O'
 	! !
 
-!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 5/31/2018 21:14:48'!
+!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 6/3/2018 17:35:45'!
+playerOWon
+
+	state _ 'O Won!!'.! !
+
+!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 6/3/2018 18:08:42'!
 playerOmarkedAt: aPosition
 
-	markedPositions add: aPosition.
-	
+	self at: aPosition put: $O.
 	! !
 
-!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 5/31/2018 21:09:55'!
+!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 6/3/2018 16:57:55'!
 playerXTurn
 	
+	state _ 'Playing X'
 	! !
 
-!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 5/31/2018 21:15:01'!
+!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 6/3/2018 17:35:38'!
+playerXWon
+
+	state _ 'X Won!!'.! !
+
+!TicTacToeVisualizer methodsFor: 'as yet unclassified' stamp: 'AD 6/3/2018 18:08:29'!
 playerXmarkedAt: aPosition
 
-	markedPositions add: aPosition.
-
-	  ! !
+	self at: aPosition put: $X.! !
 
 
-!TicTacToeVisualizer methodsFor: 'visualization' stamp: 'AD 5/31/2018 21:15:59'!
+!TicTacToeVisualizer methodsFor: 'visualization' stamp: 'AD 6/3/2018 17:27:25'!
 view
+
+	| board |
 	
-	markedPositions size = 1 ifTrue: [
-	^ OrderedCollection
-		with: ' | | '
-		with: '-----'
-		with: ' |X| '
-		with: '-----'
-		with: ' | | '
-		with: 'Playing O'.].
+	board _ self boardFor: markedPositions.
 	
-	^ OrderedCollection
-		with: ' | | '
-		with: '-----'
-		with: ' |X| '
-		with: '-----'
-		with: 'O| | '
-		with: 'Playing X'.! !
+	board add: state.
+	
+	^ board.! !
 
 
-!TicTacToeVisualizer methodsFor: 'initialization' stamp: 'AD 5/31/2018 21:16:43'!
+!TicTacToeVisualizer methodsFor: 'initialization' stamp: 'AD 6/3/2018 17:34:47'!
 initialize
 
-	markedPositions _ OrderedCollection new.! !
+	markedPositions _ OrderedCollection new.
+	
+	3 timesRepeat: [markedPositions add: (OrderedCollection with: $  with: $  with: $ )]! !
+
+
+!TicTacToeVisualizer methodsFor: 'visualization - private' stamp: 'AD 6/3/2018 18:06:48'!
+at: aPosition put: aLetter
+
+	(markedPositions at: 4 - aPosition y) at: aPosition x put: aLetter.! !
+
+!TicTacToeVisualizer methodsFor: 'visualization - private' stamp: 'AD 6/3/2018 17:33:22'!
+boardFor: positions
+
+	| board |
+	
+	board _ OrderedCollection new.
+	
+	board add: (self printPositionsAt: 1);
+		    add: '-----';
+		    add: (self printPositionsAt: 2);
+		    add: '-----';
+		    add: (self printPositionsAt: 3).
+	
+	^ board! !
+
+!TicTacToeVisualizer methodsFor: 'visualization - private' stamp: 'AD 6/3/2018 17:31:03'!
+printPositionsAt: aLine		
+		
+		^ String streamContents: [ :stream | 
+			stream nextPut: ((markedPositions at: aLine) at: 1);
+					nextPut: $|;
+					nextPut: ((markedPositions at: aLine) at: 2);
+					nextPut: $|;
+					nextPut: ((markedPositions at: aLine) at: 3).
+		].! !
