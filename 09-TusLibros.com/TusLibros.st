@@ -253,17 +253,18 @@ add: anAmountOfBooks of: aBook
 	
 	bookRequests add: aBook -> amountOfBooks.! !
 
-!Cart methodsFor: 'operations' stamp: 'AD 6/5/2018 12:31:52'!
+!Cart methodsFor: 'operations' stamp: 'AD 6/5/2018 14:22:09'!
 cancel: aBook
 
-	bookRequests removeKey: aBook ifAbsent: [self error: self class bookIsNotInTheCartErrorMessage].
+	self assertsInTheCart: aBook.
+	bookRequests removeKey: aBook
 	
 	! !
 
-!Cart methodsFor: 'operations' stamp: 'AD 6/5/2018 13:44:13'!
+!Cart methodsFor: 'operations' stamp: 'AD 6/5/2018 14:22:19'!
 modifyAmountOf: aBook to: anAmountOfBooks
 
-	(self includes: aBook) ifFalse:[self error: self class bookIsNotInTheCartErrorMessage].
+	self assertsInTheCart: aBook.
 	
 	bookRequests at: aBook put: anAmountOfBooks.! !
 
@@ -294,6 +295,13 @@ assertAddingPositive: anAmountOfBooks
 assertIsInCatalog: aBook
 
 	(catalog includes: aBook) ifFalse: [ self error: self class cantAddABookThatIsNotInCatalogErrorMessage ].! !
+
+!Cart methodsFor: 'asserting' stamp: 'AD 6/5/2018 14:21:43'!
+assertsInTheCart: aBook
+
+	(self includes: aBook) ifFalse:[self error: self class bookIsNotInTheCartErrorMessage].
+
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
