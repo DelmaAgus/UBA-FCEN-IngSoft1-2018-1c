@@ -1,307 +1,303 @@
-!classDefinition: #CartTest category: #TusLibros!
-TestCase subclass: #CartTest
+!classDefinition: #TusLibrosTest category: #TusLibros!
+TestCase subclass: #TusLibrosTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/4/2018 21:17:10'!
-test01ANewCartIsEmpty
+!TusLibrosTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:08'!
+test01NewCartsAreCreatedEmpty
 
-	| cart  |
-	
-	cart _ Cart new.
-	
-	self assert: cart isEmpty.! !
+	self assert: self createCart isEmpty! !
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 11:43:42'!
-test02ABookIsAddedToACartCorrectly
-	| cart aBook |
-	cart _ Cart new.
-	aBook _ 'Un libro que está en el catálogo'.
-	cart add: aBook.
-	
-	self deny: cart isEmpty.
-	self assert: cart amountOfBookRequests equals: 1.
-	self assert: (cart includes: aBook).! !
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 18:53:32'!
+test02CanNotAddItemsThatDoNotBelongToStore
+	| cart |
+	cart _ self createCart.
+	self
+		should: [ cart add: self itemNotSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidItemErrorMessage.
+			self assert: cart isEmpty ].! !
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 10:21:29'!
-test03CantAddABookThatIsNotInCatalog
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 18:53:10'!
+test03AfterAddingAnItemTheCartIsNotEmptyAnymore
+	| cart |
+	cart _ self createCart.
+	cart add: self itemSoldByTheStore.
+	self deny: cart isEmpty.! !
 
-	| cart  aBook |
-	
-	cart _ Cart new.
-	
-	aBook := 'Un libro que no está en el catálogo'.
-	
-	self should:  [cart  add: aBook] 
-	raise: Error - MessageNotUnderstood 
-	withExceptionDo: [:anError|
-			self assert: anError messageText equals: Cart cantAddABookThatIsNotInCatalogErrorMessage.
-			self assert: cart isEmpty.
-		].
-	
-	
-! !
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 18:53:10'!
+test04CanNotAddNonPositiveNumberOfItems
+	| cart |
+	cart _ self createCart.
+	self
+		should: [
+			cart
+				add: 0
+				of: self itemSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidQuantityErrorMessage.
+			self assert: cart isEmpty ].! !
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 11:44:09'!
-test04AnAmountOfBooksIsAddedToACartCorrectly
-	| cart aBook |
-	cart _ Cart new.
-	aBook _ 'Un libro que está en el catálogo'.
-	cart add: 5 of: aBook.
-	
-	self deny: cart isEmpty.
-	self assert: cart amountOfBookRequests equals: 1.
-	self assert: (cart amountOf: aBook) equals: 5.
-	self assert: (cart includes: aBook).! !
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 18:55:01'!
+test05CanNotAddMoreThanOneItemNotSoldByTheStore
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 10:03:57'!
-test05CantAddLessThanOneBookToACart
+	| cart |
+	
+	cart _ self createCart.
+	
+	self should: [	cart add: 2 of: self itemNotSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidItemErrorMessage.
+			self assert: cart isEmpty ].! !
 
-	| cart  aBook |
-	
-	cart _ Cart new.
-	
-	aBook := 'Un libro que está en el catálogo'.
-	
-	self should: [cart add: 0 of: aBook]
-	 raise: Error - MessageNotUnderstood 
-	 withExceptionDo: [:anError|
-		self assert: anError messageText equals: Cart cantAddLessThanOneBookErrorMessage.
-		self assert: cart isEmpty.
-		].
-	
-	
-	self assert: cart isEmpty.! !
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 18:54:35'!
+test06CartRemembersAddedItems
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 12:23:06'!
-test06CanListAllTheRequestedBooksInTheCartCorrectly
+	| cart |
+	
+	cart _ self createCart.
+	
+	cart add: self itemSoldByTheStore.
+	
+	self assert: (cart includes: self itemSoldByTheStore).! !
 
-	| cart  aBook anotherBook requestedBooks|
-	
-	cart _ Cart new.
-	
-	aBook := 'Un libro que está en el catálogo'.
-	anotherBook := 'Otro libro que está en el catálogo'.
-	
-	cart add: 5 of: aBook.
-	cart add: 3 of: anotherBook.
-	
-	requestedBooks _ cart requestedBooks.
-	
-	self assert: requestedBooks size equals: 2.
-	self assert: (requestedBooks includesKey: aBook).
-	self assert: (requestedBooks at: aBook) equals: 5.
-	self assert: (requestedBooks includesKey: anotherBook).
-	self assert: (requestedBooks at: anotherBook) equals: 3.
-	
-	! !
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 18:54:28'!
+test07CartDoesNotHoldNotAddedItems
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 12:22:50'!
-test07CanAddMoreThanOneRequestOfTheSameBookInACartAndTheAmountIsAccumulatedCorrectly
+	| cart |
+	
+	cart _ self createCart.
+	
+	self deny: (cart includes: self itemSoldByTheStore).! !
 
-	| cart  aBook requestedBooks|
-	
-	cart _ Cart new.
-	
-	aBook := 'Un libro que está en el catálogo'.
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 18:54:20'!
+test08CartRemembersTheNumberOfAddedItems
 
+	| cart |
 	
-	cart add: 5 of: aBook.
-	cart add: 3 of: aBook.
+	cart _ self createCart.
+	cart add: 2 of: self itemSoldByTheStore.
 	
-	requestedBooks _ cart requestedBooks.
-	
-	self assert: requestedBooks size equals: 1.
-	self assert: (requestedBooks includesKey: aBook).
-	self assert: (requestedBooks at: aBook) equals: 8.
-	
-	! !
+	self assert: (cart occurrencesOf: self itemSoldByTheStore) = 2.! !
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 12:28:36'!
-test08CanCancelARequestedBookInTheCart
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 18:58:17'!
+test09CanNotAddNonIntegerNumberOfItems
 
-	| cart  aBook|
+	| cart |
 	
-	cart _ Cart new.
+	cart _ self createCart.
 	
-	aBook := 'Un libro que está en el catálogo'.
+	self should: [	cart add: 1.5 of: self itemSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidQuantityErrorMessage.
+			self assert: cart isEmpty ].! !
 
-	
-	cart add: 5 of: aBook.
-	
-	cart cancel: aBook.
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 20:11:36'!
+test10CanNotCreateACashierForAnEmptyCart
 
-
+	| emptyCart validCard |
 	
-	self assert: cart isEmpty.
+	emptyCart _ self createEmptyCart.
+	validCard _ self createCreditCard.
 	
-	! !
+	self should: [	Cashier for: emptyCart payingWith: validCard on: Date today ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cashier canNotCheckOutAnEmptyCartErrorMessage .
+			].! !
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 12:31:42'!
-test09CantCancelARequestedBookThatIsNotInTheCart
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 20:11:47'!
+test11CanNotCreateACashierWithAnExpiredCreditCard
 
-	| cart  aBook|
+	| cart expiredCard |
 	
-	cart _ Cart new.
+	cart _ self createCart.
 	
-	aBook := 'Un libro que está en el catálogo'.
+	cart add: self itemSoldByTheStore.
+	
+	expiredCard _ self createExpiredCreditCard.
+	
+	self should: [	Cashier for: cart payingWith: expiredCard on: Date today ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cashier canNotPayWithAnExpiredCardErrorMessage.
+			].! !
 
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 20:18:17'!
+test12
+
+	| cart creditCard cashier purchaseTotal |
+	
+	cart _ self createCart.
+	
+	cart add: self itemSoldByTheStore.
+	
+	creditCard _ self createCreditCard.
+	
+	cashier _ Cashier for: cart payingWith: creditCard on: Date today.
+	
+	purchaseTotal _ cashier checkOut.
 		
-	self should: [cart cancel: aBook] 
-	raise: Error - MessageNotUnderstood 
-	 withExceptionDo: [:anError|
+	self assert: purchaseTotal equals: 10.! !
+
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 20:43:35'!
+test13
+
+	| cart creditCard cashier purchaseTotal catalog |	
+	
+	catalog _ Dictionary new.
+	catalog at: 'aBook' put: 10.
+	
+	cart _ Cart acceptingItemsOf: catalog.
+	
+	cart add: 2 of: 'aBook'.
+	
+	creditCard _ self createCreditCard.
+	
+	cashier _ Cashier for: cart payingWith: creditCard on: Date today.
+	
+	purchaseTotal _ cashier checkOut.
 		
-		self assert: anError messageText equals: Cart bookIsNotInTheCartErrorMessage.
-		self assert: cart isEmpty.
+	self assert: purchaseTotal equals: 20.! !
+
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 20:43:03'!
+test14
+
+	| cart creditCard cashier purchaseTotal catalog |	
+	
+	catalog _ Dictionary new.
+	catalog at: 'aBook' put: 10; at: 'otherBook' put: 20.
+	
+	cart _ Cart acceptingItemsOf: catalog.
+	
+	cart add: 'aBook'.
+	cart add: 'otherBook'.
+	
+	creditCard _ self createCreditCard.
+	
+	cashier _ Cashier for: cart payingWith: creditCard on: Date today.
+	
+	purchaseTotal _ cashier checkOut.
 		
-		].
+	self assert: purchaseTotal equals: 30.! !
 
 
+!TusLibrosTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:48'!
+createCart
 	
-	
-	
-	! !
+	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 13:34:07'!
-test10CanModifyTheAmountOfARequestedBookInTheCartCorrectly
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 19:41:26'!
+createCreditCard
+	
+	^ CreditCard expiringOn: (Date tomorrow).! !
 
-	| cart  aBook|
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 19:08:10'!
+createEmptyCart
 	
-	cart _ Cart new.
-	
-	aBook := 'Un libro que está en el catálogo'.
+	^ Cart acceptingItemsOf: self defaultCatalog.! !
 
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 19:40:19'!
+createExpiredCreditCard
 	
-	cart add: 5 of: aBook.
-	
-	cart modifyAmountOf: aBook to: 3.
+	^ CreditCard expiringOn: (Date yesterday).! !
 
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 20:01:45'!
+defaultCatalog
+	
+	| catalog |
+	
+	catalog _ Dictionary new.
+	
+	catalog at: self itemSoldByTheStore put: 10.
+	
+	^ catalog! !
 
-	
-	self assert: (cart amountOf: aBook) equals: 3.
-	
-	! !
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 18:53:32'!
+itemNotSoldByTheStore
+	^ 'invalidBook'.! !
 
-!CartTest methodsFor: 'tests' stamp: 'AD 6/5/2018 13:38:53'!
-test11CantModifyTheAmountOfARequestedBookThatIsNotInTheCart
-
-	| cart  aBook|
-	
-	cart _ Cart new.
-	
-	aBook := 'Un libro que está en el catálogo'.
-
-		
-	self should: [cart modifyAmountOf: aBook to: 1]
-	raise: Error - MessageNotUnderstood 
-	 withExceptionDo: [:anError|
-		
-		self assert: anError messageText equals: Cart bookIsNotInTheCartErrorMessage.
-		self assert: cart isEmpty.
-		
-		].
-
-
-	
-	
-	
-	! !
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 18:53:10'!
+itemSoldByTheStore
+	^ 'validBook'.! !
 
 
 !classDefinition: #Cart category: #TusLibros!
 Object subclass: #Cart
-	instanceVariableNames: 'catalog bookRequests'
+	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cart methodsFor: 'initialization' stamp: 'AD 6/5/2018 11:49:53'!
-initialize
+!Cart methodsFor: 'error messages' stamp: 'HernanWilkinson 6/17/2013 17:45'!
+invalidItemErrorMessage
+	
+	^'Item is not in catalog'! !
 
-	bookRequests _ Dictionary new.
-	catalog _ OrderedCollection with: 'Un libro que está en el catálogo' with: 'Otro libro que está en el catálogo'.! !
+!Cart methodsFor: 'error messages' stamp: 'HernanWilkinson 6/17/2013 17:45'!
+invalidQuantityErrorMessage
+	
+	^'Invalid number of items'! !
 
 
-!Cart methodsFor: 'testing' stamp: 'AD 6/5/2018 11:45:34'!
-includes: aBook
+!Cart methodsFor: 'assertions' stamp: 'AD 6/7/2018 20:02:40'!
+assertIsValidItem: anItem
 
-	^ bookRequests includesKey: aBook.! !
+	catalog at: anItem ifAbsent: [ self error: self invalidItemErrorMessage ]! !
 
-!Cart methodsFor: 'testing' stamp: 'AD 6/5/2018 11:45:49'!
+!Cart methodsFor: 'assertions' stamp: 'AD 6/7/2018 19:01:06'!
+assertIsValidQuantity: aQuantity
+
+	((aQuantity isInteger) and: [ aQuantity strictlyPositive ]) ifFalse: [ self error: self invalidQuantityErrorMessage ]! !
+
+
+!Cart methodsFor: 'initialization' stamp: 'AD 6/7/2018 19:21:56'!
+initializeAcceptingItemsOf: aCatalog
+
+	catalog := aCatalog.
+	items := Bag new.! !
+
+
+!Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
+occurrencesOf: anItem
+
+	^items occurrencesOf: anItem  ! !
+
+!Cart methodsFor: 'queries' stamp: 'AD 6/7/2018 20:42:04'!
+total
+	
+	^ items sum: [:item | catalog at: item]! !
+
+
+!Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
+includes: anItem
+
+	^items includes: anItem ! !
+
+!Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
 isEmpty
-
-	^ bookRequests size = 0.! !
-
-
-!Cart methodsFor: 'operations' stamp: 'AD 6/5/2018 11:49:10'!
-add: aBook
-
-	self add: 1 of: aBook.! !
-
-!Cart methodsFor: 'operations' stamp: 'AD 6/5/2018 12:22:04'!
-add: anAmountOfBooks of: aBook
-
-	| amountOfBooks |
-	self assertIsInCatalog: aBook.
-	self assertAddingPositive: anAmountOfBooks .
 	
-	
-	(self includes: aBook) ifTrue:[amountOfBooks := anAmountOfBooks + (self amountOf: aBook) ]
-							 ifFalse:[amountOfBooks := anAmountOfBooks].
-	
-	bookRequests add: aBook -> amountOfBooks.! !
-
-!Cart methodsFor: 'operations' stamp: 'AD 6/5/2018 14:22:09'!
-cancel: aBook
-
-	self assertsInTheCart: aBook.
-	bookRequests removeKey: aBook
-	
-	! !
-
-!Cart methodsFor: 'operations' stamp: 'AD 6/5/2018 14:22:19'!
-modifyAmountOf: aBook to: anAmountOfBooks
-
-	self assertsInTheCart: aBook.
-	
-	bookRequests at: aBook put: anAmountOfBooks.! !
+	^items isEmpty ! !
 
 
-!Cart methodsFor: 'amounts' stamp: 'AD 6/5/2018 11:45:24'!
-amountOf: aBook
+!Cart methodsFor: 'adding' stamp: 'HernanWilkinson 6/17/2013 17:44'!
+add: anItem
 
-	^ bookRequests at: aBook.! !
+	^ self add: 1 of: anItem ! !
 
-!Cart methodsFor: 'amounts' stamp: 'AD 6/5/2018 11:45:28'!
-amountOfBookRequests
+!Cart methodsFor: 'adding' stamp: 'AD 6/7/2018 19:22:56'!
+add: aQuantity of: anItem
 
-	^ bookRequests size.! !
+	self assertIsValidQuantity: aQuantity.
+	self assertIsValidItem: anItem.
 
-
-!Cart methodsFor: 'accessing' stamp: 'AD 6/5/2018 11:38:30'!
-requestedBooks
-	
-	^ bookRequests copy.! !
-
-
-!Cart methodsFor: 'asserting' stamp: 'AD 6/5/2018 11:55:52'!
-assertAddingPositive: anAmountOfBooks
-
-	anAmountOfBooks > 0 ifFalse: [ self error: self class cantAddLessThanOneBookErrorMessage ].! !
-
-!Cart methodsFor: 'asserting' stamp: 'AD 6/5/2018 11:55:55'!
-assertIsInCatalog: aBook
-
-	(catalog includes: aBook) ifFalse: [ self error: self class cantAddABookThatIsNotInCatalogErrorMessage ].! !
-
-!Cart methodsFor: 'asserting' stamp: 'AD 6/5/2018 14:21:43'!
-assertsInTheCart: aBook
-
-	(self includes: aBook) ifFalse:[self error: self class bookIsNotInTheCartErrorMessage].
-
-	! !
+	items add: anItem withOccurrences: aQuantity.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -309,17 +305,104 @@ assertsInTheCart: aBook
 Cart class
 	instanceVariableNames: ''!
 
-!Cart class methodsFor: 'error messages' stamp: 'AD 6/5/2018 12:32:17'!
-bookIsNotInTheCartErrorMessage
-	
-	^ 'The book is not in the cart'.! !
+!Cart class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 17:48'!
+acceptingItemsOf: aCatalog
 
-!Cart class methodsFor: 'error messages' stamp: 'AD 6/4/2018 21:51:31'!
-cantAddABookThatIsNotInCatalogErrorMessage
-	
-	^ 'Can not add a book that doesnt belong to the editorial'! !
+	^self new initializeAcceptingItemsOf: aCatalog ! !
 
-!Cart class methodsFor: 'error messages' stamp: 'AD 6/5/2018 10:05:42'!
-cantAddLessThanOneBookErrorMessage
+
+!classDefinition: #Cashier category: #TusLibros!
+Object subclass: #Cashier
+	instanceVariableNames: 'cart creditCard'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!Cashier methodsFor: 'initialization' stamp: 'AD 6/7/2018 20:06:19'!
+initializeFor: aCart payingWith: aCreditCard 
 	
-	^ 'Can not add less than one book to the cart'! !
+	cart _ aCart.
+	creditCard _ aCreditCard.! !
+
+
+!Cashier methodsFor: 'check out' stamp: 'AD 6/7/2018 20:54:21'!
+checkOut
+
+	| purchaseTotal |
+	
+	purchaseTotal _ cart total.
+	
+	self debit: purchaseTotal from: creditCard.
+	
+	^ purchaseTotal.! !
+
+
+!Cashier methodsFor: 'debiting' stamp: 'AD 6/7/2018 20:42:45'!
+debit: anAmount from: aCreditCard 
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Cashier class' category: #TusLibros!
+Cashier class
+	instanceVariableNames: ''!
+
+!Cashier class methodsFor: 'instance creation' stamp: 'AD 6/7/2018 20:09:10'!
+for: aCart payingWith: aCreditCard on: aDate 
+	
+	self assertIsNotEmpty: aCart.
+	self assert: aCreditCard isNotExpiredOn: aDate.
+	
+	^ self new initializeFor: aCart payingWith: aCreditCard ! !
+
+
+!Cashier class methodsFor: 'assertions' stamp: 'AD 6/7/2018 19:34:31'!
+assert: aCreditCard isNotExpiredOn: aDate 
+	
+	(aCreditCard isExpiredOn: aDate) ifTrue: [ self error: self canNotPayWithAnExpiredCardErrorMessage ]! !
+
+!Cashier class methodsFor: 'assertions' stamp: 'AD 6/7/2018 19:15:04'!
+assertIsNotEmpty: aCart 
+	
+	aCart isEmpty ifTrue: [self error: self canNotCheckOutAnEmptyCartErrorMessage]! !
+
+
+!Cashier class methodsFor: 'error messages' stamp: 'AD 6/7/2018 19:15:40'!
+canNotCheckOutAnEmptyCartErrorMessage
+	
+	^ 'Can not check out an empty cart.'! !
+
+!Cashier class methodsFor: 'error messages' stamp: 'AD 6/7/2018 19:36:11'!
+canNotPayWithAnExpiredCardErrorMessage
+	
+	^ 'Can not pay with an expired credit card.'! !
+
+
+!classDefinition: #CreditCard category: #TusLibros!
+Object subclass: #CreditCard
+	instanceVariableNames: 'expirationDate'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!CreditCard methodsFor: 'initialization' stamp: 'AD 6/7/2018 19:30:53'!
+initializeExpiringOn: aDate 
+	
+	expirationDate _ aDate.! !
+
+
+!CreditCard methodsFor: 'queries' stamp: 'AD 6/7/2018 20:04:41'!
+isExpiredOn: aDate 
+	
+	^ expirationDate < aDate.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CreditCard class' category: #TusLibros!
+CreditCard class
+	instanceVariableNames: ''!
+
+!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/7/2018 19:35:04'!
+expiringOn: aDate 
+	
+	^ self new initializeExpiringOn: aDate! !
