@@ -193,20 +193,20 @@ createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 19:41:26'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/11/2018 09:43:36'!
 createCreditCard
 	
-	^ CreditCard expiringOn: (Date tomorrow).! !
+	^ CreditCard expiringOn: (FixedGregorianDate today monthOfYear ) next.! !
 
 !TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 19:08:10'!
 createEmptyCart
 	
 	^ Cart acceptingItemsOf: self defaultCatalog.! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 19:40:19'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/11/2018 09:43:44'!
 createExpiredCreditCard
 	
-	^ CreditCard expiringOn: (Date yesterday).! !
+	^ CreditCard expiringOn: (FixedGregorianDate today monthOfYear) previous.! !
 
 !TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 20:01:45'!
 defaultCatalog
@@ -347,7 +347,7 @@ debit: anAmount from: aCreditCard
 Cashier class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'instance creation' stamp: 'AD 6/7/2018 20:09:10'!
+!Cashier class methodsFor: 'instance creation' stamp: 'AD 6/11/2018 09:34:56'!
 for: aCart payingWith: aCreditCard on: aDate 
 	
 	self assertIsNotEmpty: aCart.
@@ -380,21 +380,20 @@ canNotPayWithAnExpiredCardErrorMessage
 
 !classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expirationDate'
+	instanceVariableNames: 'expirationMonth'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'initialization' stamp: 'AD 6/7/2018 19:30:53'!
-initializeExpiringOn: aDate 
-	
-	expirationDate _ aDate.! !
+!CreditCard methodsFor: 'initialization' stamp: 'AD 6/11/2018 09:31:39'!
+initializeExpiringOn: aMonthOfYear
+	expirationMonth _ aMonthOfYear.! !
 
 
-!CreditCard methodsFor: 'queries' stamp: 'AD 6/7/2018 20:04:41'!
-isExpiredOn: aDate 
-	
-	^ expirationDate < aDate.! !
+!CreditCard methodsFor: 'queries' stamp: 'AD 6/11/2018 09:40:23'!
+isExpiredOn: aDate
+
+	^ expirationMonth < ((FixedGregorianDate fromDate: aDate) monthOfYear).! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -402,7 +401,7 @@ isExpiredOn: aDate
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/7/2018 19:35:04'!
-expiringOn: aDate 
+!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/11/2018 09:31:22'!
+expiringOn: aMonthOfYear 
 	
-	^ self new initializeExpiringOn: aDate! !
+	^ self new initializeExpiringOn: aMonthOfYear! !

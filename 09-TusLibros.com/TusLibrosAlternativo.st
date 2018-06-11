@@ -193,15 +193,15 @@ createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/9/2018 20:14:23'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/11/2018 09:23:15'!
 createCreditCard
 	
-	^ CreditCard withExpiration: Date tomorrow! !
+	^ CreditCard withExpiration: (FixedGregorianDate today monthOfYear) next! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/9/2018 20:14:33'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/11/2018 09:23:42'!
 createExpiredCreditCard
 	
-	^ CreditCard withExpiration: Date yesterday! !
+	^ CreditCard withExpiration: (FixedGregorianDate today monthOfYear) previous! !
 
 !TusLibrosTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:43'!
 defaultCatalog
@@ -381,21 +381,19 @@ assertIsNotExpired: aCreditCard
 
 !classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expirationDate'
+	instanceVariableNames: 'expirationMonth'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'initialization' stamp: 'AD 6/9/2018 19:33:53'!
-initilalizeWithExpiration: aDate 
-	
-	expirationDate _ aDate! !
+!CreditCard methodsFor: 'initialization' stamp: 'AD 6/11/2018 09:22:22'!
+initilalizeWithExpiration: aMonthOfYear
+	expirationMonth _ aMonthOfYear.! !
 
 
-!CreditCard methodsFor: 'testing' stamp: 'AD 6/9/2018 20:10:43'!
+!CreditCard methodsFor: 'testing' stamp: 'AD 6/11/2018 09:22:22'!
 hasExpired
-	
-	^ expirationDate < Date today! !
+	^ expirationMonth < FixedGregorianDate today monthOfYear.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -403,7 +401,7 @@ hasExpired
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/9/2018 20:11:27'!
-withExpiration: aDate
+!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/11/2018 09:12:47'!
+withExpiration: aMonthOfYear
 
-	^ self new initilalizeWithExpiration: aDate.! !
+	^ self new initilalizeWithExpiration: aMonthOfYear.! !
