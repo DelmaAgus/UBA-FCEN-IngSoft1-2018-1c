@@ -129,8 +129,8 @@ test11CanNotCreateACashierWithAnExpiredCreditCard
 			self assert: anError messageText = Cashier canNotPayWithAnExpiredCardErrorMessage.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 20:18:17'!
-test12
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 14:51:27'!
+test12CheckoutForACartWithOneProductReturnsTheCorrectPurchaseTotal
 
 	| cart creditCard cashier purchaseTotal |
 	
@@ -146,8 +146,8 @@ test12
 		
 	self assert: purchaseTotal equals: 10.! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 20:43:35'!
-test13
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 14:52:09'!
+test13CheckoutForACartWithMoreThanOneOfTheSameProductReturnsTheCorrectPurchaseTotal
 
 	| cart creditCard cashier purchaseTotal catalog |	
 	
@@ -166,8 +166,8 @@ test13
 		
 	self assert: purchaseTotal equals: 20.! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/7/2018 20:43:03'!
-test14
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 14:54:30'!
+test14CheckoutForACartWithDifferentProductsReturnsTheCorrectPurchaseTotal
 
 	| cart creditCard cashier purchaseTotal catalog |	
 	
