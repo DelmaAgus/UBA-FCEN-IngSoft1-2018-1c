@@ -341,13 +341,13 @@ debit: aTotalPurchase from: aCreditCard
 Cashier class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'instance creation' stamp: 'AD 6/9/2018 20:38:39'!
-for: aCart payingWith: aCreditCard using: aPriceList
+!Cashier class methodsFor: 'instance creation' stamp: 'AD 6/11/2018 10:04:53'!
+for: aCart payingWith: aCreditCard using: aCatalog
 
 	self assertIsNotEmpty: aCart.
 	self assertIsNotExpired: aCreditCard.
 	
-	^ self new initializeFor: aCart payingWith: aCreditCard using: aPriceList.! !
+	^ self new initializeFor: aCart payingWith: aCreditCard using: aCatalog.! !
 
 
 !Cashier class methodsFor: 'error messages' stamp: 'AD 6/9/2018 19:43:42'!
