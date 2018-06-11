@@ -91,7 +91,7 @@ test08CartRemembersTheNumberOfAddedItems
 	cart add: 2 of: self itemSellByTheStore.
 	self assert: (cart occurrencesOf: self itemSellByTheStore) = 2! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/9/2018 20:57:51'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 09:58:58'!
 test09CanNotCreateACashierForAnEmptyCart
 
 	| cart validCard |
@@ -99,13 +99,13 @@ test09CanNotCreateACashierForAnEmptyCart
 	cart _ self createCart.
 	validCard _ self createCreditCard.
 	
-	self should: [	Cashier for: cart payingWith: validCard using: (self defaultPriceList )]
+	self should: [	Cashier for: cart payingWith: validCard using: (self defaultCatalog )]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier CartIsEmptyErrorMessage .
 			]! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/9/2018 20:57:39'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 09:59:06'!
 test10CanNotCreateACashierWithAnExpiredCreditCard
 
 	| cart expiredCard |
@@ -114,13 +114,13 @@ test10CanNotCreateACashierWithAnExpiredCreditCard
 	cart add: self itemSellByTheStore.
 	expiredCard _ self createExpiredCreditCard.
 	
-	self should: [	Cashier for: cart payingWith: expiredCard  using: (self defaultPriceList)]
+	self should: [	Cashier for: cart payingWith: expiredCard  using: (self defaultCatalog)]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier ExpiredCreditCardErrorMessage .
 			]! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/9/2018 21:14:48'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 09:59:14'!
 test11TheTotalPurchaseOfOneItemIsReturnedCorrectlyAfterACheckout
 
 	| cart validCard cashier totalPurchase |
@@ -131,7 +131,7 @@ test11TheTotalPurchaseOfOneItemIsReturnedCorrectlyAfterACheckout
 	
 	validCard _ self createCreditCard.
 	
-	cashier _ Cashier for: cart payingWith: validCard using: (self defaultPriceList).
+	cashier _ Cashier for: cart payingWith: validCard using: (self defaultCatalog).
 	
 	totalPurchase _ cashier checkOut.
 	
@@ -140,7 +140,7 @@ test11TheTotalPurchaseOfOneItemIsReturnedCorrectlyAfterACheckout
 	
 ! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/9/2018 21:14:37'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 09:59:21'!
 test12TheTotalPurchaseOfAnAmountGreaterThanOneOfAnItemIsReturnedCorrectlyAfterACheckout
 
 	| cart validCard cashier totalPurchase |
@@ -151,7 +151,7 @@ test12TheTotalPurchaseOfAnAmountGreaterThanOneOfAnItemIsReturnedCorrectlyAfterAC
 	
 	validCard _ self createCreditCard.
 	
-	cashier _ Cashier for: cart payingWith: validCard using: (self defaultPriceList).
+	cashier _ Cashier for: cart payingWith: validCard using: (self defaultCatalog).
 	
 	totalPurchase _ cashier checkOut.
 	
@@ -160,16 +160,14 @@ test12TheTotalPurchaseOfAnAmountGreaterThanOneOfAnItemIsReturnedCorrectlyAfterAC
 	
 ! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/9/2018 21:06:01'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 10:00:12'!
 test13TheTotalPurchaseODifferentItemsIsReturnedCorrectlyAfterACheckout
 
-	| cart creditCard cashier totalPurchase catalog priceList |	
+	| cart creditCard cashier totalPurchase catalog |	
 	
-	catalog _ OrderedCollection new.
-	catalog add: 'aBook'; add: 'anotherBook'.
 	
-	priceList _ Dictionary new.
-	priceList at: 'aBook' put: 10; at: 'anotherBook' put: 20.
+	catalog _ Dictionary new.
+	catalog at: 'aBook' put: 10; at: 'anotherBook' put: 20.
 	
 	cart _ Cart acceptingItemsOf: catalog.
 	
@@ -178,7 +176,7 @@ test13TheTotalPurchaseODifferentItemsIsReturnedCorrectlyAfterACheckout
 	
 	creditCard _ self createCreditCard.
 	
-	cashier _ Cashier for: cart payingWith: creditCard using: priceList.
+	cashier _ Cashier for: cart payingWith: creditCard using: catalog.
 	
 	totalPurchase _ cashier checkOut.
 		
@@ -203,18 +201,13 @@ createExpiredCreditCard
 	
 	^ CreditCard withExpiration: (FixedGregorianDate today monthOfYear) previous! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:43'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/11/2018 09:58:35'!
 defaultCatalog
+	| catalog |
+	catalog _ Dictionary new.
+	catalog at: (self itemSellByTheStore) put: 10.
 	
-	^ Array with: self itemSellByTheStore! !
-
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/9/2018 20:42:01'!
-defaultPriceList
-	| priceList |
-	priceList _ Dictionary new.
-	priceList at: (self itemSellByTheStore) put: 10.
-	
-	^ priceList! !
+	^ catalog! !
 
 !TusLibrosTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:44'!
 itemNotSellByTheStore
@@ -245,10 +238,10 @@ invalidQuantityErrorMessage
 	^'Invalid number of items'! !
 
 
-!Cart methodsFor: 'assertions' stamp: 'HernanWilkinson 6/17/2013 17:51'!
+!Cart methodsFor: 'assertions' stamp: 'AD 6/11/2018 10:01:32'!
 assertIsValidItem: anItem
 
-	(catalog includes: anItem) ifFalse: [ self error: self invalidItemErrorMessage ]! !
+	(catalog includesKey: anItem) ifFalse: [ self error: self invalidItemErrorMessage ]! !
 
 !Cart methodsFor: 'assertions' stamp: 'AD 6/9/2018 21:10:42'!
 assertIsValidQuantity: aQuantity
@@ -274,7 +267,7 @@ occurrencesOf: anItem
 	^items occurrencesOf: anItem  ! !
 
 
-!Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
+!Cart methodsFor: 'testing' stamp: 'AD 6/11/2018 10:03:15'!
 includes: anItem
 
 	^items includes: anItem ! !
@@ -312,29 +305,29 @@ acceptingItemsOf: aCatalog
 
 !classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
-	instanceVariableNames: 'cart creditCard priceList'
+	instanceVariableNames: 'cart creditCard catalog'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cashier methodsFor: 'initialization' stamp: 'AD 6/9/2018 20:39:24'!
-initializeFor: aCart payingWith: aCreditCard using: aPriceList.
-
+!Cashier methodsFor: 'initialization' stamp: 'AD 6/11/2018 09:57:02'!
+initializeFor: aCart payingWith: aCreditCard using: aCatalog
+	self.
 	cart _ aCart.
 	creditCard _ aCreditCard.
-	priceList _ aPriceList! !
+	catalog _ aCatalog.! !
 
 
-!Cashier methodsFor: 'check out' stamp: 'AD 6/9/2018 21:11:18'!
+!Cashier methodsFor: 'check out' stamp: 'AD 6/11/2018 09:56:48'!
 checkOut
 
 	| totalPurchase |
-		
-	totalPurchase _ cart items sum: [:item | priceList at: item].
+	totalPurchase _ cart items sum: [ :item | catalog at: item ].
 	
 	self debit: totalPurchase from: creditCard.
 	
-	^ totalPurchase! !
+	^ totalPurchase.
+	! !
 
 
 !Cashier methodsFor: 'debit' stamp: 'AD 6/9/2018 20:56:21'!
