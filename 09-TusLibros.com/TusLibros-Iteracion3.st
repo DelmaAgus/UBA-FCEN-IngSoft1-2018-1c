@@ -211,7 +211,7 @@ test14CheckoutForACartWithDifferentProductsReturnsTheCorrectPurchaseTotal
 	self assert: saleTotal equals: 30.
 	self assert: (salesBook at: 1) equals: 30! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 20:51:18'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/12/2018 08:23:03'!
 test15ASaleIsNotRegisteredWhenPayingWithAStolenCard
 
 	| cart validCard salesBook cashier merchantProcessor stolenCardErrorMessage |
@@ -231,10 +231,9 @@ test15ASaleIsNotRegisteredWhenPayingWithAStolenCard
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = stolenCardErrorMessage.
 			self assert: salesBook isEmpty.
-			self assert: merchantProcessor hasBeenExecuted.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 20:51:26'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/12/2018 08:23:09'!
 test16ASaleIsNotRegisteredWhenPayingWithACreditCardWithoutEnoughMoney
 
 	| cart validCard salesBook cashier merchantProcessor notEnoughMoneyInCardErrorMessage |
@@ -255,32 +254,32 @@ test16ASaleIsNotRegisteredWhenPayingWithACreditCardWithoutEnoughMoney
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = notEnoughMoneyInCardErrorMessage.
 			self assert: salesBook isEmpty.
-			self assert: merchantProcessor hasBeenExecuted.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 20:51:42'!
-test17ASaleIsRegisteredWhenPayingWithAValidCardYATESTEADOOOOOO
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/12/2018 08:33:27'!
+test17ASaleIsNotRegisteredWhenPayingWithACreditCardWithANameLongerThan30Characters
 
-	| cart validCard cashier saleTotal salesBook merchantProcessor |
+	| cart validCard salesBook cashier merchantProcessor ownerNameTooLongErrorMessage |
+	ownerNameTooLongErrorMessage _ 'The Credit Card has an owner name longer than 30 characters'.
 	
 	cart _ self createCart.
 	
 	cart add: self itemSoldByTheStore.
 	
-	validCard _ self createCreditCard.
+	validCard _ self createLongNameCreditCard.
 	
-	salesBook _ OrderedCollection  new.
+	salesBook _ OrderedCollection new.
 	
-	merchantProcessor _ MerchantProcessorSimulator new.
+	merchantProcessor _ MerchantProcessorSimulator answering: [self error: ownerNameTooLongErrorMessage ].
 	cashier _ Cashier toCheckOut: cart payingWith: validCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor.
-	
-	saleTotal _ cashier checkOut.
-	
-	self assert: saleTotal equals: 10.
-	self assert: (salesBook at: 1) equals: 10.
-	self assert: merchantProcessor hasBeenExecuted.! !
+	self should: [cashier checkOut]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = ownerNameTooLongErrorMessage.
+			self assert: salesBook isEmpty.
+			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 20:31:25'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/12/2018 08:33:21'!
 test18CanNotCheckOutACartMoreThanOneTime
 
 	| cart validCard cashier saleTotal salesBook merchantProcessor |
@@ -309,48 +308,31 @@ test18CanNotCheckOutACartMoreThanOneTime
 			self assert: salesBook size = 1.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/11/2018 20:50:38'!
-test19MerchantProcessorIsNotExecutedWithAnExpiredCardAndSaleIsNotRegistered
-
-	| cart expiredCard salesBook merchantProcessor | 
-	
-	cart _ self createCart.
-	
-	cart add: self itemSoldByTheStore.
-	
-	expiredCard _ self createExpiredCreditCard.
-	
-	salesBook _ OrderedCollection new.
-		
-	merchantProcessor _ MerchantProcessorSimulator new.
-	self should: [ Cashier toCheckOut: cart payingWith: expiredCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor]
-		raise: Error - MessageNotUnderstood
-		withExceptionDo: [ :anError |
-			self assert: anError messageText = Cashier canNotPayWithAnExpiredCardErrorMessage.
-			self assert: salesBook isEmpty.
-			self deny: merchantProcessor hasBeenExecuted.
-			].! !
-
 
 !TusLibrosTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:48'!
 createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/11/2018 09:43:36'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/12/2018 08:32:20'!
 createCreditCard
 	
-	^ CreditCard expiringOn: (FixedGregorianDate today monthOfYear ) next.! !
+	^ CreditCard withOwner: 'John Doe' expiringOn: (FixedGregorianDate today monthOfYear ) next.! !
 
 !TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 19:08:10'!
 createEmptyCart
 	
 	^ Cart acceptingItemsOf: self defaultCatalog.! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/11/2018 09:43:44'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/12/2018 08:32:01'!
 createExpiredCreditCard
 	
-	^ CreditCard expiringOn: (FixedGregorianDate today monthOfYear) previous.! !
+	^ CreditCard withOwner: 'John Doe' expiringOn: (FixedGregorianDate today monthOfYear) previous.! !
+
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/12/2018 08:31:22'!
+createLongNameCreditCard
+	
+	^ CreditCard withOwner: 'A very very long name of an owner' expiringOn: (FixedGregorianDate today monthOfYear ) next.! !
 
 !TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 20:01:45'!
 defaultCatalog
@@ -528,17 +510,18 @@ canNotPayWithAnExpiredCardErrorMessage
 	
 	^ 'Can not pay with an expired credit card.'! !
 
-
 
 !classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expirationMonth'
+	instanceVariableNames: 'expirationMonth owner'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'initialization' stamp: 'AD 6/11/2018 09:31:39'!
-initializeExpiringOn: aMonthOfYear
+!CreditCard methodsFor: 'initialization' stamp: 'AD 6/12/2018 08:29:39'!
+initializeWithOwner: aName ExpiringOn: aMonthOfYear
+
+	owner _ aName.
 	expirationMonth _ aMonthOfYear.! !
 
 
@@ -553,42 +536,33 @@ isExpiredOn: aDate
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/11/2018 09:31:22'!
-expiringOn: aMonthOfYear 
+!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/12/2018 08:28:58'!
+withOwner: aName expiringOn: aMonthOfYear 
 	
-	^ self new initializeExpiringOn: aMonthOfYear! !
+	^ self new initializeWithOwner: aName ExpiringOn: aMonthOfYear! !
 
 
 !classDefinition: #MerchantProcessorSimulator category: #TusLibros!
 Object subclass: #MerchantProcessorSimulator
-	instanceVariableNames: 'response executed'
+	instanceVariableNames: 'response'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!MerchantProcessorSimulator methodsFor: 'testing' stamp: 'AD 6/11/2018 20:50:08'!
-hasBeenExecuted
-
-	^ executed.! !
-
-
-!MerchantProcessorSimulator methodsFor: 'initialization' stamp: 'AD 6/11/2018 20:49:36'!
+!MerchantProcessorSimulator methodsFor: 'initialization' stamp: 'AD 6/12/2018 08:22:07'!
 initialize
 
-	executed _ false.
 	response _ [].! !
 
-!MerchantProcessorSimulator methodsFor: 'initialization' stamp: 'AD 6/11/2018 20:49:43'!
+!MerchantProcessorSimulator methodsFor: 'initialization' stamp: 'AD 6/12/2018 08:22:13'!
 initializeAnswering: aResponseBlock
 
-	executed _ false.
 	response _ aResponseBlock.! !
 
 
-!MerchantProcessorSimulator methodsFor: 'debiting' stamp: 'AD 6/11/2018 20:49:17'!
+!MerchantProcessorSimulator methodsFor: 'debiting' stamp: 'AD 6/12/2018 08:21:40'!
 debit: anAmount from: aCreditCard 
 	
-	executed _ true.
 	response value.
 	
 	! !
