@@ -530,6 +530,11 @@ isExpiredOn: aDate
 
 	^ expirationMonth < ((FixedGregorianDate fromDate: aDate) monthOfYear).! !
 
+!CreditCard methodsFor: 'queries' stamp: 'AD 6/12/2018 08:37:01'!
+owner
+
+	^ owner! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'CreditCard class' category: #TusLibros!
