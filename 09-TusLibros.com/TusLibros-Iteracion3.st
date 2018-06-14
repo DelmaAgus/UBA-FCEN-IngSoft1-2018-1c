@@ -211,33 +211,30 @@ test14CheckoutForACartWithDifferentProductsReturnsTheCorrectPurchaseTotal
 	self assert: saleTotal equals: 30.
 	self assert: (salesBook at: 1) equals: 30! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/12/2018 08:23:03'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 15:16:14'!
 test15ASaleIsNotRegisteredWhenPayingWithAStolenCard
 
-	| cart validCard salesBook cashier merchantProcessor stolenCardErrorMessage |
-	stolenCardErrorMessage _ 'The Credit Card is stolen'.
-	cart _ self createCart.
-	
+	| cart validCard salesBook cashier merchantProcessor |
+	cart _ self createCart.	
 	cart add: self itemSoldByTheStore.
-	
 	validCard _ self createCreditCard.
 	
 	salesBook _ OrderedCollection new.
 	
-	merchantProcessor _ MerchantProcessorSimulator answering: [self error: stolenCardErrorMessage ].
+	merchantProcessor _ MerchantProcessorSimulator answering: [self error: self stolenCardErrorMessage ].
+	
 	cashier _ Cashier toCheckOut: cart payingWith: validCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor.
 	self should: [cashier checkOut]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = stolenCardErrorMessage.
+			self assert: anError messageText = self stolenCardErrorMessage.
 			self assert: salesBook isEmpty.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/12/2018 08:23:09'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 15:15:31'!
 test16ASaleIsNotRegisteredWhenPayingWithACreditCardWithoutEnoughMoney
 
-	| cart validCard salesBook cashier merchantProcessor notEnoughMoneyInCardErrorMessage |
-	notEnoughMoneyInCardErrorMessage _ 'The Credit Card doesnt have enough money'.
+	| cart validCard salesBook cashier merchantProcessor  |
 	
 	cart _ self createCart.
 	
@@ -247,21 +244,20 @@ test16ASaleIsNotRegisteredWhenPayingWithACreditCardWithoutEnoughMoney
 	
 	salesBook _ OrderedCollection new.
 	
-	merchantProcessor _ MerchantProcessorSimulator answering: [self error: notEnoughMoneyInCardErrorMessage ].
+	merchantProcessor _ MerchantProcessorSimulator answering: [self error: self notEnoughMoneyInCardErrorMessage ].
+	
 	cashier _ Cashier toCheckOut: cart payingWith: validCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor.
 	self should: [cashier checkOut]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = notEnoughMoneyInCardErrorMessage.
+			self assert: anError messageText = self notEnoughMoneyInCardErrorMessage.
 			self assert: salesBook isEmpty.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/12/2018 08:33:27'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 15:29:16'!
 test17ASaleIsNotRegisteredWhenPayingWithACreditCardWithANameLongerThan30Characters
 
-	| cart validCard salesBook cashier merchantProcessor ownerNameTooLongErrorMessage |
-	ownerNameTooLongErrorMessage _ 'The Credit Card has an owner name longer than 30 characters'.
-	
+	| cart validCard salesBook cashier merchantProcessor |
 	cart _ self createCart.
 	
 	cart add: self itemSoldByTheStore.
@@ -270,43 +266,48 @@ test17ASaleIsNotRegisteredWhenPayingWithACreditCardWithANameLongerThan30Characte
 	
 	salesBook _ OrderedCollection new.
 	
-	merchantProcessor _ MerchantProcessorSimulator answering: [self error: ownerNameTooLongErrorMessage ].
+	merchantProcessor _ MerchantProcessorSimulator answering: [self error: self ownerNameTooLongForProcessingErrorMessage ].
 	cashier _ Cashier toCheckOut: cart payingWith: validCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor.
 	self should: [cashier checkOut]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = ownerNameTooLongErrorMessage.
+			self assert: anError messageText = self ownerNameTooLongForProcessingErrorMessage.
 			self assert: salesBook isEmpty.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/12/2018 08:33:21'!
-test18CanNotCheckOutACartMoreThanOneTime
-
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 15:52:10'!
+test18ACashierCanNotCheckOutMoreThanOnce
 	| cart validCard cashier saleTotal salesBook merchantProcessor |
-	
 	cart _ self createCart.
-	
 	cart add: self itemSoldByTheStore.
-	
 	validCard _ self createCreditCard.
-	
-	salesBook _ OrderedCollection  new.
-	
+	salesBook _ OrderedCollection new.
 	merchantProcessor _ MerchantProcessorSimulator new.
-	cashier _ Cashier toCheckOut: cart payingWith: validCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor.
+	cashier _ Cashier
+		toCheckOut: cart
+		payingWith: validCard
+		on: Date today
+		registeringOn: salesBook
+		processingPaymentWith: merchantProcessor.
 	saleTotal _ cashier checkOut.
-	
-	self assert: saleTotal equals: 10.
-	self assert: (salesBook at: 1) equals: 10.
-	
-	self should: [saleTotal _ saleTotal + cashier checkOut]
+	self
+		assert: saleTotal
+		equals: 10.
+	self
+		assert: (salesBook at: 1)
+		equals: 10.
+	self
+		should: [ saleTotal _ saleTotal + cashier checkOut ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = Cashier canNotCheckOutACartMoreThanOneTimeErrorMessage.
-			self assert: saleTotal equals: 10.
-			self assert: (salesBook at: 1) equals: 10.
-			self assert: salesBook size = 1.
-			].! !
+			self assert: anError messageText = Cashier aCashierCanCheckOutOnlyOnceErrorMessageErrorMessage.
+			self
+				assert: saleTotal
+				equals: 10.
+			self
+				assert: (salesBook at: 1)
+				equals: 10.
+			self assert: salesBook size = 1 ].! !
 
 
 !TusLibrosTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:48'!
@@ -352,6 +353,22 @@ itemNotSoldByTheStore
 !TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 18:53:10'!
 itemSoldByTheStore
 	^ 'validBook'.! !
+
+
+!TusLibrosTest methodsFor: 'error messages' stamp: 'AD 6/14/2018 15:15:18'!
+notEnoughMoneyInCardErrorMessage
+	
+	^ 'The Credit Card doesnt have enough money'! !
+
+!TusLibrosTest methodsFor: 'error messages' stamp: 'AD 6/14/2018 15:29:29'!
+ownerNameTooLongForProcessingErrorMessage
+	
+	'Credit cards owner name too long for processing.'! !
+
+!TusLibrosTest methodsFor: 'error messages' stamp: 'AD 6/14/2018 15:16:36'!
+stolenCardErrorMessage
+
+	^ 'The Credit Card is stolen'! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -454,18 +471,16 @@ initializeToCheckOut: aCart payingWith: aCreditCard on: aDate registeringOn: aSa
 	saleIsProcessed _ false.! !
 
 
-!Cashier methodsFor: 'check out' stamp: 'AD 6/11/2018 20:29:32'!
+!Cashier methodsFor: 'check out' stamp: 'AD 6/14/2018 15:52:10'!
 checkOut
-
 	| saleTotal |
-	saleIsProcessed ifTrue: [ self error: self class canNotCheckOutACartMoreThanOneTimeErrorMessage ].
-	
+	saleIsProcessed ifTrue: [ self error: self class aCashierCanCheckOutOnlyOnceErrorMessageErrorMessage ].
 	saleTotal _ cart total.
-	merchantProcessor debit: saleTotal from: creditCard.
-	
+	merchantProcessor
+		debit: saleTotal
+		from: creditCard.
 	salesBook add: saleTotal.
 	saleIsProcessed _ true.
-	
 	^ saleTotal.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -495,10 +510,9 @@ assertIsNotEmpty: aCart
 	aCart isEmpty ifTrue: [self error: self canNotCheckOutAnEmptyCartErrorMessage]! !
 
 
-!Cashier class methodsFor: 'error messages' stamp: 'AD 6/11/2018 20:21:39'!
-canNotCheckOutACartMoreThanOneTimeErrorMessage
-	
-	^ 'Can not checkout a cart more than one time.'! !
+!Cashier class methodsFor: 'error messages' stamp: 'AD 6/14/2018 15:52:10'!
+aCashierCanCheckOutOnlyOnceErrorMessageErrorMessage
+	^ 'A cashier can not checkout more than once.'.! !
 
 !Cashier class methodsFor: 'error messages' stamp: 'AD 6/7/2018 19:15:40'!
 canNotCheckOutAnEmptyCartErrorMessage
@@ -513,7 +527,7 @@ canNotPayWithAnExpiredCardErrorMessage
 
 !classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expirationMonth owner'
+	instanceVariableNames: 'expirationMonth owner number'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -530,7 +544,13 @@ isExpiredOn: aDate
 
 	^ expirationMonth < ((FixedGregorianDate fromDate: aDate) monthOfYear).! !
 
-!CreditCard methodsFor: 'queries' stamp: 'AD 6/12/2018 08:37:01'!
+
+!CreditCard methodsFor: 'accessing' stamp: 'AD 6/14/2018 16:01:11'!
+expirationMonth
+
+	^ expirationMonth ! !
+
+!CreditCard methodsFor: 'accessing' stamp: 'AD 6/12/2018 08:37:01'!
 owner
 
 	^ owner! !
