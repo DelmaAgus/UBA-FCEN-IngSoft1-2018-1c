@@ -211,7 +211,7 @@ test14CheckoutForACartWithDifferentProductsReturnsTheCorrectPurchaseTotal
 	self assert: saleTotal equals: 30.
 	self assert: (salesBook at: 1) equals: 30! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 15:16:14'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 17:00:56'!
 test15ASaleIsNotRegisteredWhenPayingWithAStolenCard
 
 	| cart validCard salesBook cashier merchantProcessor |
@@ -221,7 +221,7 @@ test15ASaleIsNotRegisteredWhenPayingWithAStolenCard
 	
 	salesBook _ OrderedCollection new.
 	
-	merchantProcessor _ MerchantProcessorSimulator answering: [self error: self stolenCardErrorMessage ].
+	merchantProcessor _ MerchantProcessorSimulator answering: [:amount :ownerName :cardNumber :expirationMonth | self error: self stolenCardErrorMessage ].
 	
 	cashier _ Cashier toCheckOut: cart payingWith: validCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor.
 	self should: [cashier checkOut]
@@ -231,7 +231,7 @@ test15ASaleIsNotRegisteredWhenPayingWithAStolenCard
 			self assert: salesBook isEmpty.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 15:15:31'!
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 17:01:17'!
 test16ASaleIsNotRegisteredWhenPayingWithACreditCardWithoutEnoughMoney
 
 	| cart validCard salesBook cashier merchantProcessor  |
@@ -244,7 +244,7 @@ test16ASaleIsNotRegisteredWhenPayingWithACreditCardWithoutEnoughMoney
 	
 	salesBook _ OrderedCollection new.
 	
-	merchantProcessor _ MerchantProcessorSimulator answering: [self error: self notEnoughMoneyInCardErrorMessage ].
+	merchantProcessor _ MerchantProcessorSimulator answering: [:amount :ownerName :cardNumber :expirationMonth |  self error: self notEnoughMoneyInCardErrorMessage ].
 	
 	cashier _ Cashier toCheckOut: cart payingWith: validCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor.
 	self should: [cashier checkOut]
@@ -254,10 +254,10 @@ test16ASaleIsNotRegisteredWhenPayingWithACreditCardWithoutEnoughMoney
 			self assert: salesBook isEmpty.
 			].! !
 
-!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 15:29:16'!
-test17ASaleIsNotRegisteredWhenPayingWithACreditCardWithANameLongerThan30Characters
+!TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 17:05:36'!
+test17CashierTruncatesCreditCardOwnerNamesWithMoreThan30CharsBeforeDebiting
 
-	| cart validCard salesBook cashier merchantProcessor |
+	| cart validCard salesBook cashier merchantProcessor saleTotal |
 	cart _ self createCart.
 	
 	cart add: self itemSoldByTheStore.
@@ -266,14 +266,12 @@ test17ASaleIsNotRegisteredWhenPayingWithACreditCardWithANameLongerThan30Characte
 	
 	salesBook _ OrderedCollection new.
 	
-	merchantProcessor _ MerchantProcessorSimulator answering: [self error: self ownerNameTooLongForProcessingErrorMessage ].
+	merchantProcessor _ MerchantProcessorSimulator answering: [:amount :ownerName :cardNumber :expirationMonth | self assert: ownerName equals: 'A very very long name of an ow'].
 	cashier _ Cashier toCheckOut: cart payingWith: validCard on: Date today registeringOn: salesBook processingPaymentWith: merchantProcessor.
-	self should: [cashier checkOut]
-		raise: Error - MessageNotUnderstood
-		withExceptionDo: [ :anError |
-			self assert: anError messageText = self ownerNameTooLongForProcessingErrorMessage.
-			self assert: salesBook isEmpty.
-			].! !
+	saleTotal _ cashier checkOut.
+	
+	self assert: saleTotal equals: 10.
+	self assert: (salesBook at: 1) equals: 10! !
 
 !TusLibrosTest methodsFor: 'tests' stamp: 'AD 6/14/2018 15:52:10'!
 test18ACashierCanNotCheckOutMoreThanOnce
@@ -315,25 +313,24 @@ createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/12/2018 08:32:20'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/14/2018 16:38:53'!
 createCreditCard
 	
-	^ CreditCard withOwner: 'John Doe' expiringOn: (FixedGregorianDate today monthOfYear ) next.! !
+	^CreditCard withNumber: 5400000000000001 withOwner:  'John Doe'  expiringOn: (FixedGregorianDate today monthOfYear ) next.! !
 
 !TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 19:08:10'!
 createEmptyCart
 	
 	^ Cart acceptingItemsOf: self defaultCatalog.! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/12/2018 08:32:01'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/14/2018 16:39:44'!
 createExpiredCreditCard
-	
-	^ CreditCard withOwner: 'John Doe' expiringOn: (FixedGregorianDate today monthOfYear) previous.! !
+	^CreditCard withNumber: 5400000000000001 withOwner:  'John Doe'  expiringOn: (FixedGregorianDate today monthOfYear) previous.! !
 
-!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/12/2018 08:31:22'!
+!TusLibrosTest methodsFor: 'support' stamp: 'AD 6/14/2018 16:40:34'!
 createLongNameCreditCard
 	
-	^ CreditCard withOwner: 'A very very long name of an owner' expiringOn: (FixedGregorianDate today monthOfYear ) next.! !
+	^CreditCard withNumber: 5400000000000001 withOwner: 'A very very long name of an owner'  expiringOn: (FixedGregorianDate today monthOfYear ) next.! !
 
 !TusLibrosTest methodsFor: 'support' stamp: 'AD 6/7/2018 20:01:45'!
 defaultCatalog
@@ -471,14 +468,17 @@ initializeToCheckOut: aCart payingWith: aCreditCard on: aDate registeringOn: aSa
 	saleIsProcessed _ false.! !
 
 
-!Cashier methodsFor: 'check out' stamp: 'AD 6/14/2018 15:52:10'!
+!Cashier methodsFor: 'check out' stamp: 'AD 6/14/2018 16:59:07'!
 checkOut
-	| saleTotal |
+	| saleTotal owner |
 	saleIsProcessed ifTrue: [ self error: self class aCashierCanCheckOutOnlyOnceErrorMessageErrorMessage ].
+		
+	owner _ creditCard owner.
+	
+	(owner size > 30) ifTrue: [owner _ owner truncateTo: 30].
 	saleTotal _ cart total.
-	merchantProcessor
-		debit: saleTotal
-		from: creditCard.
+	merchantProcessor debit: saleTotal from: owner onCard: creditCard expiringOn: creditCard expirationMonth.
+	
 	salesBook add: saleTotal.
 	saleIsProcessed _ true.
 	^ saleTotal.! !
@@ -532,11 +532,14 @@ Object subclass: #CreditCard
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'initialization' stamp: 'AD 6/12/2018 08:29:39'!
-initializeWithOwner: aName ExpiringOn: aMonthOfYear
-
+!CreditCard methodsFor: 'initialization' stamp: 'AD 6/14/2018 16:36:23'!
+initializeWithNumber: aCreditCardNumber Owner: aName ExpiringOn: aMonthOfYear
+	number _ aCreditCardNumber .
+	
 	owner _ aName.
-	expirationMonth _ aMonthOfYear.! !
+	expirationMonth _ aMonthOfYear.
+	
+	! !
 
 
 !CreditCard methodsFor: 'queries' stamp: 'AD 6/11/2018 09:40:23'!
@@ -550,6 +553,11 @@ expirationMonth
 
 	^ expirationMonth ! !
 
+!CreditCard methodsFor: 'accessing' stamp: 'AD 6/14/2018 16:51:26'!
+number
+
+	^number! !
+
 !CreditCard methodsFor: 'accessing' stamp: 'AD 6/12/2018 08:37:01'!
 owner
 
@@ -561,10 +569,10 @@ owner
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/12/2018 08:28:58'!
-withOwner: aName expiringOn: aMonthOfYear 
+!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/14/2018 16:35:49'!
+withNumber: aCreditCardNumber withOwner: aName expiringOn: aMonthOfYear 
 	
-	^ self new initializeWithOwner: aName ExpiringOn: aMonthOfYear! !
+	^ self new initializeWithNumber: aCreditCardNumber Owner: aName ExpiringOn: aMonthOfYear! !
 
 
 !classDefinition: #MerchantProcessorSimulator category: #TusLibros!
@@ -574,10 +582,10 @@ Object subclass: #MerchantProcessorSimulator
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!MerchantProcessorSimulator methodsFor: 'initialization' stamp: 'AD 6/12/2018 08:22:07'!
+!MerchantProcessorSimulator methodsFor: 'initialization' stamp: 'AD 6/14/2018 17:02:28'!
 initialize
 
-	response _ [].! !
+	response _ [:amount :ownerName :cardNumber :expirationMonth].! !
 
 !MerchantProcessorSimulator methodsFor: 'initialization' stamp: 'AD 6/12/2018 08:22:13'!
 initializeAnswering: aResponseBlock
@@ -585,10 +593,10 @@ initializeAnswering: aResponseBlock
 	response _ aResponseBlock.! !
 
 
-!MerchantProcessorSimulator methodsFor: 'debiting' stamp: 'AD 6/12/2018 08:21:40'!
-debit: anAmount from: aCreditCard 
+!MerchantProcessorSimulator methodsFor: 'debiting' stamp: 'AD 6/14/2018 16:49:34'!
+debit: anAmount from: ownerName onCard: cardNumber expiringOn: expirationMonth 
 	
-	response value.
+	^ response value: anAmount value: ownerName value: cardNumber value: expirationMonth.
 	
 	! !
 
