@@ -229,102 +229,191 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/14/2018 21:27:48'!
-test01
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:08:55'!
+test01CanNotCreateACartWithAnInvalidUsername
 
-	| restInterface userDatabase invalidUsername password 
-	catalog |
-	userDatabase _ testObjectsFactory defaultUserDatabase.
-	catalog _ testObjectsFactory defaultCatalog.
-
-	restInterface _ RestInterface with: userDatabase acceptingItemsFrom: catalog.
-	invalidUsername _ 'An invalid username' .
-	password _  '1234'.
+	| restInterface invalidUsername password |
 	
-	self should:  [restInterface createCartWith: invalidUsername and: password]
-	raise:  Error - MessageNotUnderstood 
-	withExceptionDo: [: anError |
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	
+	invalidUsername _ testObjectsFactory invalidUsername.
+	password _  testObjectsFactory validPassword.
+	
+	self should: [	restInterface createCartFor: invalidUsername and: password ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self
+				assert: anError messageText
+				equals: restInterface class invalidUserMessageText ].! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:08:59'!
+test02CanNotCreateACartWithAnInvalidPassword
+
+	| restInterface username invalidPassword |
+	
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	
+	username _ testObjectsFactory validUsername.
+	invalidPassword _ testObjectsFactory invalidPassword.
+	
+	self should: [ restInterface createCartFor: username	and: invalidPassword ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText	equals: restInterface class invalidPasswordErrorMessage
+		].! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:09:03'!
+test03ACartIsCreatedEmpty
+
+	| restInterface username password cartID itemsList |
+	
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	
+	username _ testObjectsFactory validUsername.
+	password _ testObjectsFactory validPassword.
+	
+	cartID _ restInterface createCartFor: username and: password.
+	itemsList _ restInterface listCart: cartID.
+	
+	self assert: itemsList isEmpty.! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:09:06'!
+test04CartRegistersItemsAdded
+
+	| restInterface username password cartID itemsList book |
+	
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	
+	username _ testObjectsFactory validUsername.
+	password _ testObjectsFactory validPassword.
+	
+	cartID _ restInterface createCartFor: username and: password.
+	book _ testObjectsFactory itemSoldByTheStore.
+	
+	restInterface add: 1 of: book to: cartID.
+	itemsList _ restInterface listCart: cartID.
+	
+	self deny: itemsList isEmpty.
+	self assert: (itemsList at: book) equals: 1.! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:10:54'!
+test05CanNotAddProductsToAnInexistentCart
+
+	| restInterface invalidCartID book |
+	
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	
+	book _ testObjectsFactory itemSoldByTheStore.
+	
+	invalidCartID _ testObjectsFactory invalidCartID.	
+	
+	self should:  [ restInterface add: 1 of: book to: invalidCartID. ]
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo: [: anError |
+			self assert: anError messageText equals: restInterface class invalidCartIDMessageText.
+		].! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:09:12'!
+test06CanNotListPurchasesForAnInvalidUsername
+
+	| restInterface invalidUsername password |
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	invalidUsername _ testObjectsFactory invalidUsername.
+	password _  testObjectsFactory validPassword.
+	self should:  [ restInterface listPurchasesFor: invalidUsername with: password.]
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo: [: anError |
 			self assert: anError messageText equals: restInterface class invalidUserMessageText.
-		].
-	
+		].! !
 
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:09:16'!
+test07CanNotListPurchasesWithAnInvalidPassword
 
-	! !
-
-!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/14/2018 21:28:23'!
-test02
-
-	| restInterface userDatabase username invalidPassword catalog |
-	
-	userDatabase _ testObjectsFactory defaultUserDatabase.
-	catalog _ testObjectsFactory defaultCatalog.
-
-	restInterface _ RestInterface with: userDatabase acceptingItemsFrom: catalog.
-	username _ 'John Doe' .
-	invalidPassword _  '4321'.
-	
-	self should:  [restInterface createCartWith: username and: invalidPassword]
+	| restInterface username invalidPassword |	
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	username _ testObjectsFactory validUsername.
+	invalidPassword _ testObjectsFactory invalidPassword.
+	self should:  [restInterface listPurchasesFor: username with: invalidPassword.]
 	raise:  Error - MessageNotUnderstood 
 	withExceptionDo: [: anError |
 			self assert: anError messageText equals: restInterface class invalidPasswordErrorMessage.
-		].
+		].! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:09:21'!
+test08AUserThatDidntBuyAnythingHasNoPurchasesRegistered
+
+	| restInterface username password purchasesList |
 	
-
-
-	! !
-
-!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/14/2018 21:28:59'!
-test03
-
-	| restInterface userDatabase username password cartID itemsList catalog |
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
 	
-	userDatabase _ testObjectsFactory defaultUserDatabase.
-	catalog _ testObjectsFactory defaultCatalog.
-
-	restInterface _ RestInterface with: userDatabase acceptingItemsFrom: catalog.
-	username _ 'John Doe' .
-	password _  '1234'.
+	username _ testObjectsFactory validUsername.
+	password _ testObjectsFactory validPassword.
 	
-	cartID _ restInterface createCartWith: username and: password.
+	purchasesList _ restInterface listPurchasesFor: username with: password.
 	
-	itemsList _ restInterface list: cartID.
+	self assert: purchasesList isEmpty.! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:10:37'!
+test09CanNotCheckOutAnInexistentCart
+
+	| restInterface invalidCartID |
 	
-	self assert: itemsList isEmpty.
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
 	
-
-
-	! !
-
-!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/14/2018 21:26:39'!
-test04
-
-	| restInterface userDatabase username password cartID itemsList book catalog |
+	invalidCartID _ testObjectsFactory invalidCartID.	
 	
-	userDatabase _ testObjectsFactory defaultUserDatabase.
-	catalog _ testObjectsFactory defaultCatalog.
+	self should:  [ restInterface checkOutCart: invalidCartID payingWithCard: testObjectsFactory defaultCreditCardNumber expiringOn: testObjectsFactory futureExpirationDate ownedBy: 'Juan'.]
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo: [: anError |
+			self assert: anError messageText equals: restInterface class invalidCartIDMessageText.
+		].! !
 
-	restInterface _ RestInterface with: userDatabase acceptingItemsFrom: catalog.
-	username _ 'John Doe' .
-	password _  '1234'.
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:07:16'!
+test10AClientsPurchasesAreRegisteredCorrectly
+
+	| restInterface username password cartID book listOfPurchases |
 	
-	cartID _ restInterface createCartWith: username and: password.
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	
+	username _ testObjectsFactory validUsername.
+	password _ testObjectsFactory validPassword.
+	
+	cartID _ restInterface createCartFor: username and: password.
+	
 	book _ testObjectsFactory itemSoldByTheStore.
+	restInterface add: 1 of: book to: cartID.
 	
-	restInterface add: 1 of: book to: cartID.  
+	restInterface checkOutCart: cartID payingWithCard: testObjectsFactory defaultCreditCardNumber expiringOn: testObjectsFactory futureExpirationDate ownedBy: 'Juan'.
+	listOfPurchases _ restInterface listPurchasesFor: username with: password.
 	
-	itemsList _ restInterface list: cartID.
+	self assert: listOfPurchases size = 1.
+	self assert: (listOfPurchases at: 1) totalItemsSold equals: 1.
+	self assert: (listOfPurchases at: 1) total equals: testObjectsFactory itemSoldByTheStorePrice.! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 18:10:10'!
+test11CanNotListAnInexistentCart
+
+	| restInterface invalidCartID |
 	
-	self deny: itemsList isEmpty.
-	self assert: (itemsList at: book) equals: 1.
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
 	
+	invalidCartID _ testObjectsFactory invalidCartID.	
+	
+	self should:  [ restInterface listCart: invalidCartID.]
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo: [: anError |
+			self assert: anError messageText equals: restInterface class invalidCartIDMessageText.
+		].! !
 
 
+!RestInterfaceTest methodsFor: 'merchant processor protocol' stamp: 'AD 6/17/2018 15:37:16'!
+debit: anAmount from: aCreditCard 
 	! !
 
 
 !classDefinition: #Cart category: #TusLibros!
 Object subclass: #Cart
-	instanceVariableNames: 'catalog items'
+	instanceVariableNames: 'catalog items owner'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -351,10 +440,13 @@ assertIsValidQuantity: aQuantity
 	aQuantity strictlyPositive ifFalse: [ self error: self invalidQuantityErrorMessage ]! !
 
 
-!Cart methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 17:48'!
-initializeAcceptingItemsOf: aCatalog
-
+!Cart methodsFor: 'initialization' stamp: 'AD 6/17/2018 16:51:07'!
+initializeFor: anOwner acceptingItemsOf: aCatalog 
+		
+	owner _ anOwner.
+		
 	catalog := aCatalog.
+	
 	items := OrderedCollection new.! !
 
 
@@ -406,21 +498,31 @@ itemList
 	
 	^ list. ! !
 
+!Cart methodsFor: 'listing' stamp: 'AD 6/17/2018 17:02:50'!
+itemListRaw		
+	^ items copy.! !
+
+
+!Cart methodsFor: 'accessing' stamp: 'AD 6/17/2018 17:00:06'!
+owner
+
+	^ owner! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cart class' category: #TusLibros!
 Cart class
 	instanceVariableNames: ''!
 
-!Cart class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 17:48'!
-acceptingItemsOf: aCatalog
-
-	^self new initializeAcceptingItemsOf: aCatalog ! !
+!Cart class methodsFor: 'instance creation' stamp: 'AD 6/17/2018 16:51:47'!
+for: aClient acceptingItemsOf: aCatalog 
+	
+	^ self new initializeFor: aClient acceptingItemsOf: aCatalog ! !
 
 
 !classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
-	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total'
+	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total buyer'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -431,10 +533,9 @@ calculateTotal
 	total := cart total.
 	! !
 
-!Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:07'!
+!Cashier methodsFor: 'checkout - private' stamp: 'AD 6/17/2018 16:54:13'!
 createSale
-
-	^ Sale of: total
+	^ Sale for: cart.
 ! !
 
 !Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:06'!
@@ -443,7 +544,7 @@ debitTotal
 	merchantProcessor debit: total from: creditCard.
 	! !
 
-!Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:06'!
+!Cashier methodsFor: 'checkout - private' stamp: 'AD 6/17/2018 17:05:36'!
 registerSale
 
 	salesBook add: self createSale! !
@@ -511,21 +612,25 @@ creditCardHasNoCreditErrorMessage
 
 !classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expiration'
+	instanceVariableNames: 'expiration number owner'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 18:39'!
+!CreditCard methodsFor: 'testing' stamp: 'AD 6/17/2018 15:31:14'!
 isExpiredOn: aDate 
 	
-	^expiration start < (Month month: aDate monthIndex year: aDate yearNumber) start ! !
+	^expiration < (GregorianMonthOfYear yearNumber: aDate yearNumber monthNumber: aDate monthIndex)! !
 
 
-!CreditCard methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:38'!
-initializeExpiringOn: aMonth 
+!CreditCard methodsFor: 'initialization' stamp: 'AD 6/17/2018 15:19:06'!
+initializeWithNumber: creditCardNumber expiringOn: aMonthOfYear ownedBy: ownerName
+
+	number _ creditCardNumber.
 	
-	expiration := aMonth ! !
+	expiration _ aMonthOfYear.
+	
+	owner _ ownerName.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -533,68 +638,119 @@ initializeExpiringOn: aMonth
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 18:38'!
-expiringOn: aMonth 
+!CreditCard class methodsFor: 'instance creation' stamp: 'AD 6/17/2018 15:17:50'!
+number: number expiringOn: aMonthOfYear ownedBy: owner 
 	
-	^self new initializeExpiringOn: aMonth! !
+	^ self new initializeWithNumber: number expiringOn: aMonthOfYear ownedBy: owner ! !
 
 
 !classDefinition: #RestInterface category: #TusLibros!
 Object subclass: #RestInterface
-	instanceVariableNames: 'userDatabase carts catalog'
+	instanceVariableNames: 'userDatabase carts catalog merchantProcessor salesBook'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!RestInterface methodsFor: 'initialization' stamp: 'AD 6/14/2018 21:06:17'!
-initializeWith: aUserDatabase
-
-	userDatabase _ aUserDatabase.
-	
-	carts _ Dictionary new.
-	! !
-
-!RestInterface methodsFor: 'initialization' stamp: 'AD 6/14/2018 21:24:57'!
-initializeWith: userDataBase acceptingItemsFrom: aCatalog 
+!RestInterface methodsFor: 'initialization' stamp: 'AD 6/17/2018 15:38:56'!
+initializeWith: userDataBase acceptingItemsFrom: aCatalog chargingThrough: aMerchantProcessor 
 	
 	userDatabase _ userDataBase.
 	
 	catalog _ aCatalog.
 	
-	carts _ Dictionary new.! !
+	merchantProcessor _ aMerchantProcessor.
+	
+	carts _ Dictionary new.
+	
+	salesBook _ OrderedCollection new.
+	
+	! !
 
 
-!RestInterface methodsFor: 'operations' stamp: 'AD 6/14/2018 21:05:15'!
-createCartWith: aUser and: aPassword
+!RestInterface methodsFor: 'operations' stamp: 'AD 6/17/2018 17:17:01'!
+add: anAmount of: aBook to: aCartID
+	| cart |	
+	cart _ self cartFor: aCartID.
+	cart add: anAmount of: aBook.! !
+
+!RestInterface methodsFor: 'operations' stamp: 'AD 6/17/2018 17:16:09'!
+checkOutCart: cartID payingWithCard: creditCardNumber expiringOn: aMonthOfYear ownedBy: owner 
+	
+	| cart cashier creditCard sale transactionID |
+	
+	cart _ self cartFor: cartID.
+	
+	creditCard _ CreditCard number: creditCardNumber expiringOn: aMonthOfYear ownedBy: owner.
+	
+	cashier _ Cashier
+		toCheckout: cart
+		charging: creditCard
+		throught: merchantProcessor
+		on: self today
+		registeringOn: salesBook.
+		
+	sale _ cashier checkOut.
+		
+	transactionID _ sale hash.
+		
+	^ transactionID.! !
+
+!RestInterface methodsFor: 'operations' stamp: 'AD 6/17/2018 16:48:41'!
+createCartFor: aUser and: aPassword
 
 	| cart cartID |
 	
-	(userDatabase keys includes: aUser) ifFalse: [ self error: self class invalidUserMessageText. ].
+	self assertIsValid: aUser andMatches: aPassword.
 	
-	((userDatabase at: aUser) = aPassword) ifFalse: [self error: self class invalidPasswordErrorMessage].
-	
-	cart _ Cart acceptingItemsOf: catalog.
+	cart _ Cart for: aUser acceptingItemsOf: catalog.
 	
 	cartID _ 1.
-	
 	carts at: cartID put: cart.
 	
 	^ cartID.! !
 
-!RestInterface methodsFor: 'operations' stamp: 'AD 6/14/2018 21:02:11'!
-list: aCartID 
+!RestInterface methodsFor: 'operations' stamp: 'AD 6/17/2018 17:19:39'!
+listCart: aCartID
+
 	
-	^ (carts at: aCartID) itemList.! !
+
+	^ (self cartFor: aCartID) itemList.! !
+
+!RestInterface methodsFor: 'operations' stamp: 'AD 6/17/2018 15:57:33'!
+listPurchasesFor: aUsername with: aPassword 
+
+	self assertIsValid: aUsername andMatches: aPassword.
+	
+	^ salesBook select: [:sale | sale buyer = aUsername].! !
 
 
-!RestInterface methodsFor: 'as yet unclassified' stamp: 'AD 6/14/2018 21:18:51'!
-add: anAmount of: aBook to: aCart
+!RestInterface methodsFor: 'assertions' stamp: 'AD 6/17/2018 14:46:43'!
+assert: aPassword isCorrectFor: aUsername
+	
+	((userDatabase at: aUsername) = aPassword) ifFalse: [self error: self class invalidPasswordErrorMessage].! !
 
-	| cart |
+!RestInterface methodsFor: 'assertions' stamp: 'AD 6/17/2018 14:45:54'!
+assertIsValid: aUsername
 	
-	cart _ carts at: aCart.
+	(userDatabase keys includes: aUsername) ifFalse: [ self error: self class invalidUserMessageText.].! !
+
+!RestInterface methodsFor: 'assertions' stamp: 'AD 6/17/2018 14:46:55'!
+assertIsValid: aUsername andMatches: aPassword
 	
-	cart add: anAmount of: aBook.! !
+	self assertIsValid: aUsername.
+	self assert: aPassword isCorrectFor: aUsername.! !
+
+
+!RestInterface methodsFor: 'time' stamp: 'AD 6/17/2018 15:19:51'!
+today
+	
+	^ Date today.! !
+
+
+!RestInterface methodsFor: 'as yet unclassified' stamp: 'AD 6/17/2018 17:15:53'!
+cartFor: aCartID
+
+	^ carts at: aCartID ifAbsent: [self error: self class invalidCartIDMessageText ].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -602,13 +758,16 @@ add: anAmount of: aBook to: aCart
 RestInterface class
 	instanceVariableNames: ''!
 
-!RestInterface class methodsFor: 'instance creation' stamp: 'AD 6/14/2018 21:22:46'!
-with: userDataBase acceptingItemsFrom: catalog
-
-		^ self new initializeWith: userDataBase acceptingItemsFrom: catalog.
+!RestInterface class methodsFor: 'instance creation' stamp: 'AD 6/17/2018 15:34:42'!
+with: userDatabase acceptingItemsFrom: catalog chargingThrough: merchantProcessor 
 	
-	! !
+	^ self new initializeWith: userDatabase acceptingItemsFrom: catalog chargingThrough: merchantProcessor! !
 
+
+!RestInterface class methodsFor: 'error messages' stamp: 'AD 6/17/2018 15:01:36'!
+invalidCartIDMessageText
+	
+	^ 'Invalid cart ID.'! !
 
 !RestInterface class methodsFor: 'error messages' stamp: 'AD 6/14/2018 20:35:37'!
 invalidPasswordErrorMessage
@@ -623,21 +782,31 @@ invalidUserMessageText
 
 !classDefinition: #Sale category: #TusLibros!
 Object subclass: #Sale
-	instanceVariableNames: 'total'
+	instanceVariableNames: 'saleCart'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Sale methodsFor: 'total' stamp: 'HernanWilkinson 6/17/2013 18:48'!
+!Sale methodsFor: 'total' stamp: 'AD 6/17/2018 16:59:09'!
 total
+	^ saleCart total.! !
+
+
+!Sale methodsFor: 'initialization' stamp: 'AD 6/17/2018 17:08:17'!
+initializeFor: aCart
+
+	saleCart _ aCart copy.! !
+
+
+!Sale methodsFor: 'accessing' stamp: 'AD 6/17/2018 16:59:09'!
+buyer
+	^ saleCart owner.! !
+
+
+!Sale methodsFor: 'queries' stamp: 'AD 6/17/2018 17:03:04'!
+totalItemsSold
 	
-	^ total! !
-
-
-!Sale methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:47'!
-initializeTotal: aTotal
-
-	total := aTotal ! !
+	^ saleCart itemListRaw size.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -645,11 +814,10 @@ initializeTotal: aTotal
 Sale class
 	instanceVariableNames: ''!
 
-!Sale class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 18:47'!
-of: aTotal
-
-	"should assert total is not negative or 0!!"
-	^self new initializeTotal: aTotal ! !
+!Sale class methodsFor: 'instance creation' stamp: 'AD 6/17/2018 16:55:21'!
+for: saleCart 
+	
+	^ self new initializeFor: saleCart.! !
 
 
 !classDefinition: #StoreTestObjectsFactory category: #TusLibros!
@@ -672,37 +840,44 @@ itemSoldByTheStorePrice
 	^ 10.! !
 
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HernanWilkinson 6/17/2013 18:08'!
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'AD 6/17/2018 17:04:13'!
 createCart
 	
-	^Cart acceptingItemsOf: self defaultCatalog! !
+	^Cart for: 'SomeClient' acceptingItemsOf: self defaultCatalog! !
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'AD 6/14/2018 20:03:06'!
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'AD 6/17/2018 17:52:15'!
 defaultCatalog
 	^ Dictionary new
-		
+	
 			at: self itemSoldByTheStore
 			put: self itemSoldByTheStorePrice;
 		yourself.! !
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'AD 6/14/2018 20:50:42'!
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'AD 6/17/2018 17:52:37'!
 defaultUserDatabase
 	^ Dictionary new
-		
-			at: 'John Doe'
-			put: '1234';
+			at: self validUsername 
+			put: self validPassword;
 		yourself. ! !
 
 
-!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/17/2013 18:37'!
-expiredCreditCard
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'AD 6/17/2018 17:48:35'!
+defaultCreditCardNumber
 	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber - 1)! !
+	^ '1234567890123456'! !
 
-!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/17/2013 18:36'!
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'AD 6/17/2018 17:49:51'!
+expiredCreditCard
+	^CreditCard number: self defaultCreditCardNumber 
+					expiringOn: self pastExpirationDate
+					ownedBy: 'John Doe'.! !
+
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'AD 6/17/2018 17:49:47'!
 notExpiredCreditCard
 	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber + 1)! !
+	^CreditCard number: self defaultCreditCardNumber 
+					expiringOn: self futureExpirationDate
+					ownedBy: 'John Doe'.! !
 
 
 !StoreTestObjectsFactory methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:37'!
@@ -711,7 +886,52 @@ initialize
 	today := DateAndTime now! !
 
 
+!StoreTestObjectsFactory methodsFor: 'date' stamp: 'AD 6/17/2018 17:43:11'!
+futureExpirationDate
+
+	^ (GregorianMonthOfYear yearNumber: today yearNumber monthNumber: today monthIndex) next! !
+
+!StoreTestObjectsFactory methodsFor: 'date' stamp: 'AD 6/17/2018 17:44:14'!
+pastExpirationDate
+
+	^ (GregorianMonthOfYear yearNumber: today yearNumber monthNumber: today monthIndex) previous! !
+
 !StoreTestObjectsFactory methodsFor: 'date' stamp: 'HernanWilkinson 6/17/2013 18:37'!
 today
 	
 	^ today! !
+
+
+!StoreTestObjectsFactory methodsFor: 'usernames and passwords' stamp: 'AD 6/17/2018 17:51:33'!
+invalidPassword
+
+	^ '4321'! !
+
+!StoreTestObjectsFactory methodsFor: 'usernames and passwords' stamp: 'AD 6/17/2018 17:50:57'!
+invalidUsername
+
+	^ 'not John Doe'! !
+
+!StoreTestObjectsFactory methodsFor: 'usernames and passwords' stamp: 'AD 6/17/2018 17:51:21'!
+validPassword
+
+	^ '1234'! !
+
+!StoreTestObjectsFactory methodsFor: 'usernames and passwords' stamp: 'AD 6/17/2018 17:50:30'!
+validUsername
+
+	^ 'John Doe'! !
+
+
+!StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'AD 6/17/2018 18:08:12'!
+defaultInterfaceChargingThrough: aMerchantProcessor 
+ 
+	^ RestInterface with: self defaultUserDatabase
+						  acceptingItemsFrom: self defaultCatalog
+						  chargingThrough: aMerchantProcessor.
+	! !
+
+!StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'AD 6/17/2018 18:10:25'!
+invalidCartID
+	
+	^ '47'! !
