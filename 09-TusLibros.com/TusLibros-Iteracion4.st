@@ -476,12 +476,12 @@ test13MultipleClientsPurchasesAreRegisteredCorrectly
 	
 ! !
 
-!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 14:40:42'!
+!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 14:49:50'!
 test14CanNotAddItemsToAnExpiredCart
 
 	| facade username password cartID book manualClock |
 	
-	manualClock _ ManualClock new.
+	manualClock _ ManualClock new setTo: DateAndTime now.
 	
 	facade _ TusLibrosFacade
 		with: testObjectsFactory defaultUserDatabase
@@ -501,6 +501,67 @@ test14CanNotAddItemsToAnExpiredCart
 	manualClock forward: 60 minutes.
 	
 	self should: [	facade add: 1 of: book to: cartID ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self
+				assert: anError messageText
+				equals: facade class cartExpiredErrorMessage ].! !
+
+!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 14:52:16'!
+test15CanNotListItemsOfAnExpiredCart
+
+	| facade username password cartID manualClock |
+	
+	manualClock _ ManualClock new setTo: DateAndTime now.
+	
+	facade _ TusLibrosFacade
+		with: testObjectsFactory defaultUserDatabase
+		acceptingItemsFrom: testObjectsFactory defaultCatalog
+		chargingThrough: self
+		watchingTimeOn: manualClock.
+		
+	username _ testObjectsFactory validUsername.
+	password _ testObjectsFactory validPassword.
+	
+	cartID _ facade createCartFor: username and: password.
+		
+	"Pasan 60 minutos ..............."
+	manualClock forward: 60 minutes.
+	
+	self should: [	facade listCart: cartID]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self
+				assert: anError messageText
+				equals: facade class cartExpiredErrorMessage ].! !
+
+!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 14:53:56'!
+test16CanNotCheckoutAnExpiredCart
+
+	| facade username password cartID manualClock book |
+	
+	manualClock _ ManualClock new setTo: DateAndTime now.
+	
+	facade _ TusLibrosFacade
+		with: testObjectsFactory defaultUserDatabase
+		acceptingItemsFrom: testObjectsFactory defaultCatalog
+		chargingThrough: self
+		watchingTimeOn: manualClock.
+		
+	username _ testObjectsFactory validUsername.
+	password _ testObjectsFactory validPassword.
+	
+	cartID _ facade createCartFor: username and: password.
+	
+	book _ testObjectsFactory itemSoldByTheStore.
+	facade add: 1 of: book to: cartID.
+	
+	
+		
+	"Pasan 60 minutos ..............."
+	manualClock forward: 60 minutes.
+	
+	self should: [	facade checkOutCart: cartID payingWithCard: testObjectsFactory defaultCreditCardNumber expiringOn: testObjectsFactory futureExpirationDate ownedBy: 'Juan'.]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
 			self
