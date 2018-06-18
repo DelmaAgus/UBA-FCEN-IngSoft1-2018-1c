@@ -591,48 +591,6 @@ for: aClient acceptingItemsOf: aCatalog
 	^ self new initializeFor: aClient acceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #CartSystemInfo category: #TusLibros!
-Object subclass: #CartSystemInfo
-	instanceVariableNames: 'cart lastTimeUsed'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'TusLibros'!
-
-!CartSystemInfo methodsFor: 'update' stamp: 'AD 6/17/2018 22:43:26'!
-updateLastTimeUsedTo: aTime
-
-	lastTimeUsed _ aTime! !
-
-
-!CartSystemInfo methodsFor: 'accesing' stamp: 'AD 6/17/2018 22:41:03'!
-cart
-
-	^ cart! !
-
-!CartSystemInfo methodsFor: 'accesing' stamp: 'AD 6/17/2018 22:41:14'!
-lastTimeUsed
-
-	^ lastTimeUsed! !
-
-
-!CartSystemInfo methodsFor: 'initialization' stamp: 'AD 6/17/2018 22:40:31'!
-initializeFor: aCart On: aTime
-
-	cart _ aCart.
-	lastTimeUsed _ aTime! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'CartSystemInfo class' category: #TusLibros!
-CartSystemInfo class
-	instanceVariableNames: ''!
-
-!CartSystemInfo class methodsFor: 'instance creation' stamp: 'AD 6/17/2018 22:38:37'!
-for: aCart on: aTime
-
-	^ self new initializeFor: aCart On: aTime! !
-
-
 !classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total buyer'
@@ -793,7 +751,7 @@ add: anAmount of: aBook to: aCartID
 	
 	self updateLastUseOf: aCartID to: self now.! !
 
-!RestInterface methodsFor: 'operations' stamp: 'AD 6/17/2018 22:57:52'!
+!RestInterface methodsFor: 'operations' stamp: 'AD 6/18/2018 08:34:40'!
 checkOutCart: cartID payingWithCard: creditCardNumber expiringOn: aMonthOfYear ownedBy: owner 
 	
 	| cart cashier creditCard sale transactionID |
@@ -812,28 +770,29 @@ checkOutCart: cartID payingWithCard: creditCardNumber expiringOn: aMonthOfYear o
 		
 	sale _ cashier checkOut.
 	
-	self updateLastUseOf: cartID to: self now..
+	self updateLastUseOf: cartID to: self now.
 		
 	transactionID _ sale hash.
 	
 		
 	^ transactionID.! !
 
-!RestInterface methodsFor: 'operations' stamp: 'AD 6/17/2018 22:47:20'!
+!RestInterface methodsFor: 'operations' stamp: 'AD 6/18/2018 08:35:04'!
 createCartFor: aUser and: aPassword
-
-	| cart cartID cartSystemInfo |
-	
-	self assertIsValid: aUser andMatches: aPassword.
-	
-	cart _ Cart for: aUser acceptingItemsOf: catalog.
-	
-	cartID _ self nextCartID .
-	
-	cartSystemInfo _ CartSystemInfo for: cart on: self now.
-	
-	carts at: cartID put: cartSystemInfo.
-	
+	| cart cartID timedCart |
+	self
+		assertIsValid: aUser
+		andMatches: aPassword.
+	cart _ Cart
+		for: aUser
+		acceptingItemsOf: catalog.
+	cartID _ self nextCartID.
+	timedCart _ TimedCart
+		for: cart
+		on: self now.
+	carts
+		at: cartID
+		put: timedCart.
 	^ cartID.! !
 
 !RestInterface methodsFor: 'operations' stamp: 'AD 6/17/2018 22:58:01'!
@@ -888,21 +847,21 @@ today
 
 	^ Date today.! !
 
-!RestInterface methodsFor: 'time' stamp: 'AD 6/17/2018 22:57:01'!
+!RestInterface methodsFor: 'time' stamp: 'AD 6/18/2018 08:35:37'!
 updateLastUseOf: aCartID to: aTime
 
-	| cartSystemInfo |
-	cartSystemInfo _ carts at: aCartID.
+	| timedCart |
+	timedCart _ carts at: aCartID.
 
-	cartSystemInfo updateLastTimeUsedTo: aTime.! !
+	timedCart updateLastTimeUsedTo: aTime.! !
 
 
-!RestInterface methodsFor: 'private' stamp: 'AD 6/17/2018 22:50:20'!
+!RestInterface methodsFor: 'private' stamp: 'AD 6/18/2018 08:34:21'!
 cartFor: aCartID
 	
-	| cartSystemInfo |
-	cartSystemInfo _ carts at: aCartID ifAbsent: [self error: self class invalidCartIDMessageText ].
-	^ cartSystemInfo cart.! !
+	| timedCart |
+	timedCart _ carts at: aCartID ifAbsent: [self error: self class invalidCartIDMessageText ].
+	^ timedCart cart.! !
 
 !RestInterface methodsFor: 'private' stamp: 'AD 6/17/2018 22:16:35'!
 nextCartID
@@ -915,14 +874,14 @@ nextCartID
 	! !
 
 
-!RestInterface methodsFor: 'testing' stamp: 'AD 6/17/2018 23:11:21'!
+!RestInterface methodsFor: 'testing' stamp: 'AD 6/18/2018 08:35:16'!
 hasNotBeenUsed: aCartID forMinutes: anAmountOfMinutes
 
-	| cartSystemInfo |
+	| timedCart |
 	
-	cartSystemInfo _ carts at: aCartID.
+	timedCart _ carts at: aCartID.
 
-	^ (self now - (cartSystemInfo lastTimeUsed))  totalMinutes > anAmountOfMinutes.! !
+	^ (self now - (timedCart lastTimeUsed))  totalMinutes > anAmountOfMinutes.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1125,3 +1084,45 @@ defaultInterfaceChargingThrough: aMerchantProcessor
 invalidCartID
 	
 	^ '47'! !
+
+
+!classDefinition: #TimedCart category: #TusLibros!
+Object subclass: #TimedCart
+	instanceVariableNames: 'cart lastTimeUsed'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!TimedCart methodsFor: 'update' stamp: 'AD 6/17/2018 22:43:26'!
+updateLastTimeUsedTo: aTime
+
+	lastTimeUsed _ aTime! !
+
+
+!TimedCart methodsFor: 'accesing' stamp: 'AD 6/17/2018 22:41:03'!
+cart
+
+	^ cart! !
+
+!TimedCart methodsFor: 'accesing' stamp: 'AD 6/17/2018 22:41:14'!
+lastTimeUsed
+
+	^ lastTimeUsed! !
+
+
+!TimedCart methodsFor: 'initialization' stamp: 'AD 6/17/2018 22:40:31'!
+initializeFor: aCart On: aTime
+
+	cart _ aCart.
+	lastTimeUsed _ aTime! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TimedCart class' category: #TusLibros!
+TimedCart class
+	instanceVariableNames: ''!
+
+!TimedCart class methodsFor: 'instance creation' stamp: 'AD 6/17/2018 22:38:37'!
+for: aCart on: aTime
+
+	^ self new initializeFor: aCart On: aTime! !
