@@ -405,8 +405,40 @@ test11CanNotListAnInexistentCart
 			self assert: anError messageText equals: restInterface class invalidCartIDMessageText.
 		].! !
 
-!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/17/2018 20:07:43'!
-test12MultipleClientsPurchasesAreRegisteredCorrectly
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/18/2018 13:27:34'!
+test12AClientMultiplePurchasesAreRegisteredCorrectly
+
+	| restInterface username password cartID book listOfPurchases anotherCartID |
+	
+	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	
+	username _ testObjectsFactory validUsername.
+	password _ testObjectsFactory validPassword.
+	
+	cartID _ restInterface createCartFor: username and: password.
+	
+	book _ testObjectsFactory itemSoldByTheStore.
+	restInterface add: 1 of: book to: cartID.
+	
+	restInterface checkOutCart: cartID payingWithCard: testObjectsFactory defaultCreditCardNumber expiringOn: testObjectsFactory futureExpirationDate ownedBy: 'Juan'.
+	listOfPurchases _ restInterface listPurchasesFor: username with: password.
+	
+	anotherCartID _ restInterface createCartFor: username and: password.
+	
+	restInterface add: 10 of: book to: anotherCartID.
+	
+	restInterface checkOutCart: anotherCartID payingWithCard: testObjectsFactory defaultCreditCardNumber expiringOn: testObjectsFactory futureExpirationDate ownedBy: 'Juan'.
+	listOfPurchases _ restInterface listPurchasesFor: username with: password.
+	
+	self assert: (cartID = anotherCartID) not.
+	self assert: listOfPurchases size = 2.
+	self assert: (listOfPurchases at: 1) totalItemsSold equals: 1.
+	self assert: (listOfPurchases at: 1) total equals: testObjectsFactory itemSoldByTheStorePrice.
+	self assert: (listOfPurchases at: 2) totalItemsSold equals: 10.
+	self assert: (listOfPurchases at: 2) total equals: testObjectsFactory itemSoldByTheStorePrice * 10.! !
+
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/18/2018 13:27:43'!
+test13MultipleClientsPurchasesAreRegisteredCorrectly
 
 	| restInterface book johnDoeCartID johnDoePassword johnDoeUsername johnDoeListOfPurchases thomasSmithCartID thomasSmithListOfPurchases thomasSmithPassword thomasSmithUsername |
 	
@@ -416,21 +448,18 @@ test12MultipleClientsPurchasesAreRegisteredCorrectly
 	johnDoeUsername _ testObjectsFactory validUsername.
 	johnDoePassword _ testObjectsFactory validPassword.
 	
-	johnDoeCartID _ restInterface createCartFor: johnDoeUsername and: johnDoePassword.
-	
-
-	restInterface add: 1 of: book to: johnDoeCartID.
-	
-	restInterface checkOutCart: johnDoeCartID payingWithCard: testObjectsFactory defaultCreditCardNumber expiringOn: testObjectsFactory futureExpirationDate ownedBy: 'John Doe'.
-	johnDoeListOfPurchases _ restInterface listPurchasesFor: johnDoeUsername with: johnDoePassword.
-	
 	thomasSmithUsername _ 'Thomas Smith'.
 	thomasSmithPassword _ '5678'.
 	
+	johnDoeCartID _ restInterface createCartFor: johnDoeUsername and: johnDoePassword.
 	thomasSmithCartID _ restInterface createCartFor: thomasSmithUsername and: thomasSmithPassword.
 	
 
+	restInterface add: 1 of: book to: johnDoeCartID.
 	restInterface add: 10 of: book to: thomasSmithCartID.
+	
+	restInterface checkOutCart: johnDoeCartID payingWithCard: testObjectsFactory defaultCreditCardNumber expiringOn: testObjectsFactory futureExpirationDate ownedBy: 'John Doe'.
+	johnDoeListOfPurchases _ restInterface listPurchasesFor: johnDoeUsername with: johnDoePassword.
 	
 	restInterface checkOutCart: thomasSmithCartID payingWithCard: testObjectsFactory defaultCreditCardNumber expiringOn: testObjectsFactory futureExpirationDate ownedBy: 'Thomas Smith'.
 	thomasSmithListOfPurchases _ restInterface listPurchasesFor: thomasSmithUsername with: thomasSmithPassword.
@@ -447,12 +476,18 @@ test12MultipleClientsPurchasesAreRegisteredCorrectly
 	
 ! !
 
-!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/18/2018 11:46:23'!
-test13ACartCantBeUsedAfter30MinutesOfInactivity
+!RestInterfaceTest methodsFor: 'tests' stamp: 'AD 6/18/2018 13:21:28'!
+test14ACartCantBeUsedAfter30MinutesOfInactivity
 
-	| restInterface username password cartID book |
+	| restInterface username password cartID book manualClock |
 	
-	restInterface _ testObjectsFactory defaultInterfaceChargingThrough: self.
+	manualClock _ ManualClock new.
+	
+	restInterface _ RestInterface with: testObjectsFactory defaultUserDatabase
+						  acceptingItemsFrom: testObjectsFactory defaultCatalog
+						  chargingThrough: self
+						watchingTimeOn: manualClock.
+						
 	book _ testObjectsFactory itemSoldByTheStore.
 	
 	username _ testObjectsFactory validUsername.
@@ -462,12 +497,13 @@ test13ACartCantBeUsedAfter30MinutesOfInactivity
 
 	
 	"Pasan 60 minutos ..............."
+	manualClock forward: 60 minutes.
 	
 	
 	self should: [	restInterface add: 1 of: book to: cartID.] 
 	raise: Error - MessageNotUnderstood 
 	withExceptionDo: [:anError|
-			self assert: anError messageText equals: restInterface cartExpiredErrorMessage.
+			self assert: anError messageText equals: restInterface class cartExpiredErrorMessage.
 		].
 	
 
@@ -483,7 +519,7 @@ debit: anAmount from: aCreditCard
 
 !classDefinition: #Cart category: #TusLibros!
 Object subclass: #Cart
-	instanceVariableNames: 'catalog items owner lastUse clock'
+	instanceVariableNames: 'catalog items owner clock lastTimeUsed'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -521,18 +557,14 @@ assertIsValidQuantity: aQuantity
 	aQuantity strictlyPositive ifFalse: [ self error: self invalidQuantityErrorMessage ]! !
 
 
-!Cart methodsFor: 'initialization' stamp: 'AD 6/18/2018 11:28:34'!
-initializeFor: anOwner acceptingItemsOf: aCatalog watchingTimeOn: aClock.
-		
+!Cart methodsFor: 'initialization' stamp: 'AD 6/18/2018 13:39:45'!
+initializeFor: anOwner acceptingItemsOf: aCatalog watchingTimeOn: aClock
+	self.
 	owner _ anOwner.
-		
-	catalog := aCatalog.
-	
-	items := OrderedCollection new.
-	
+	catalog _ aCatalog.
+	items _ OrderedCollection new.
 	clock _ aClock.
-	
-	lastUse _ clock now.! !
+	lastTimeUsed _ clock time.! !
 
 
 !Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
@@ -541,13 +573,9 @@ occurrencesOf: anItem
 	^items occurrencesOf: anItem  ! !
 
 
-!Cart methodsFor: 'testing' stamp: 'AD 6/18/2018 11:34:11'!
+!Cart methodsFor: 'testing' stamp: 'AD 6/18/2018 13:39:45'!
 hasExpired
-
-
-	^ (clock now - (lastUse))  totalMinutes > 30.
-
-	! !
+	^ (clock time - lastTimeUsed) totalMinutes > 30.! !
 
 !Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
 includes: anItem
@@ -606,15 +634,13 @@ owner
 	^ owner! !
 
 
-!Cart methodsFor: 'time' stamp: 'AD 6/18/2018 11:22:07'!
+!Cart methodsFor: 'time' stamp: 'AD 6/18/2018 13:39:45'!
 lastTimeUsed
-	
-	^ lastUse.! !
+	^ lastTimeUsed.! !
 
-!Cart methodsFor: 'time' stamp: 'AD 6/18/2018 11:36:44'!
+!Cart methodsFor: 'time' stamp: 'AD 6/18/2018 13:39:45'!
 updateLastTimeUsed
-	
-	lastUse _ clock now.! !
+	lastTimeUsed _ clock time.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -725,15 +751,53 @@ Object subclass: #Clock
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Clock methodsFor: 'accessing' stamp: 'AD 6/18/2018 11:29:03'!
-now
-	
+!Clock methodsFor: 'accessing' stamp: 'AD 6/18/2018 13:37:15'!
+time
 	^ DateAndTime now.! !
 
 !Clock methodsFor: 'accessing' stamp: 'AD 6/18/2018 11:35:10'!
 today
 	
 	^ Date today.! !
+
+
+!classDefinition: #ManualClock category: #TusLibros!
+Clock subclass: #ManualClock
+	instanceVariableNames: 'time date'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!ManualClock methodsFor: 'accessing' stamp: 'AD 6/18/2018 13:33:28'!
+time
+	^ time.! !
+
+!ManualClock methodsFor: 'accessing' stamp: 'AD 6/18/2018 13:04:18'!
+today
+
+ ^ date! !
+
+
+!ManualClock methodsFor: 'initialization' stamp: 'AD 6/18/2018 13:36:17'!
+initialize
+	time _ DateAndTime now.
+	date _ Date today.! !
+
+
+!ManualClock methodsFor: 'modifiers' stamp: 'AD 6/18/2018 13:08:31'!
+forward: anAmountOfTime
+
+	time _ time + anAmountOfTime! !
+
+!ManualClock methodsFor: 'modifiers' stamp: 'AD 6/18/2018 13:07:27'!
+setDateTo: aDate
+
+	date _ aDate! !
+
+!ManualClock methodsFor: 'modifiers' stamp: 'AD 6/18/2018 13:07:32'!
+setTimeTo: aDateAndTime
+
+	time _ aDateAndTime! !
 
 
 !classDefinition: #CreditCard category: #TusLibros!
@@ -1001,10 +1065,6 @@ defaultCatalog
 			put: self itemSoldByTheStorePrice;
 		yourself.! !
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'AD 6/18/2018 11:06:44'!
-defaultClock
-	^ Clock new.! !
-
 !StoreTestObjectsFactory methodsFor: 'cart' stamp: 'AD 6/17/2018 19:40:44'!
 defaultUserDatabase
 	|userDatabase|
@@ -1014,6 +1074,11 @@ defaultUserDatabase
 	userDatabase at: 'Thomas Smith' put: '5678'.
 	
 	^ userDatabase! !
+
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'AD 6/17/2018 18:10:25'!
+invalidCartID
+	
+	^ '47'! !
 
 
 !StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'AD 6/17/2018 17:48:35'!
@@ -1035,26 +1100,15 @@ notExpiredCreditCard
 					ownedBy: 'John Doe'.! !
 
 
-!StoreTestObjectsFactory methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:37'!
+!StoreTestObjectsFactory methodsFor: 'initialization' stamp: 'AD 6/18/2018 13:36:45'!
 initialize
+	today _ DateAndTime now.! !
 
-	today := DateAndTime now! !
-
-
-!StoreTestObjectsFactory methodsFor: 'date' stamp: 'AD 6/17/2018 23:00:20'!
-anHourAgo
-	
-	^ DateAndTime now - 60 minutes.! !
 
 !StoreTestObjectsFactory methodsFor: 'date' stamp: 'AD 6/17/2018 17:43:11'!
 futureExpirationDate
 
 	^ (GregorianMonthOfYear yearNumber: today yearNumber monthNumber: today monthIndex) next! !
-
-!StoreTestObjectsFactory methodsFor: 'date' stamp: 'AD 6/17/2018 22:34:43'!
-now
-	
-	^ DateAndTime now.! !
 
 !StoreTestObjectsFactory methodsFor: 'date' stamp: 'AD 6/17/2018 17:44:14'!
 pastExpirationDate
@@ -1088,7 +1142,7 @@ validUsername
 	^ 'John Doe'! !
 
 
-!StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'AD 6/18/2018 11:12:25'!
+!StoreTestObjectsFactory methodsFor: 'interface' stamp: 'AD 6/18/2018 11:12:25'!
 defaultInterfaceChargingThrough: aMerchantProcessor 
  
 	^ RestInterface with: self defaultUserDatabase
@@ -1097,7 +1151,7 @@ defaultInterfaceChargingThrough: aMerchantProcessor
 						watchingTimeOn: self defaultClock
 	! !
 
-!StoreTestObjectsFactory methodsFor: 'as yet unclassified' stamp: 'AD 6/17/2018 18:10:25'!
-invalidCartID
-	
-	^ '47'! !
+
+!StoreTestObjectsFactory methodsFor: 'clock' stamp: 'AD 6/18/2018 11:06:44'!
+defaultClock
+	^ Clock new.! !
