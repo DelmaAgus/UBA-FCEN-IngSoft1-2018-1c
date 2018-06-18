@@ -476,18 +476,15 @@ test13MultipleClientsPurchasesAreRegisteredCorrectly
 	
 ! !
 
-!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 14:49:50'!
+!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 15:04:28'!
 test14CanNotAddItemsToAnExpiredCart
 
 	| facade username password cartID book manualClock |
 	
 	manualClock _ ManualClock new setTo: DateAndTime now.
 	
-	facade _ TusLibrosFacade
-		with: testObjectsFactory defaultUserDatabase
-		acceptingItemsFrom: testObjectsFactory defaultCatalog
-		chargingThrough: self
-		watchingTimeOn: manualClock.
+	facade _ testObjectsFactory defaultInterfaceChargingThrough: self watchingTimeOn: manualClock.
+	
 		
 	book _ testObjectsFactory itemSoldByTheStore.
 	username _ testObjectsFactory validUsername.
@@ -507,18 +504,14 @@ test14CanNotAddItemsToAnExpiredCart
 				assert: anError messageText
 				equals: facade class cartExpiredErrorMessage ].! !
 
-!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 14:52:16'!
+!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 15:04:43'!
 test15CanNotListItemsOfAnExpiredCart
 
 	| facade username password cartID manualClock |
 	
 	manualClock _ ManualClock new setTo: DateAndTime now.
 	
-	facade _ TusLibrosFacade
-		with: testObjectsFactory defaultUserDatabase
-		acceptingItemsFrom: testObjectsFactory defaultCatalog
-		chargingThrough: self
-		watchingTimeOn: manualClock.
+	facade _ testObjectsFactory defaultInterfaceChargingThrough: self watchingTimeOn: manualClock.
 		
 	username _ testObjectsFactory validUsername.
 	password _ testObjectsFactory validPassword.
@@ -535,18 +528,14 @@ test15CanNotListItemsOfAnExpiredCart
 				assert: anError messageText
 				equals: facade class cartExpiredErrorMessage ].! !
 
-!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 14:53:56'!
+!TusLibrosFacadeTest methodsFor: 'tests' stamp: 'AD 6/18/2018 15:04:51'!
 test16CanNotCheckoutAnExpiredCart
 
 	| facade username password cartID manualClock book |
 	
 	manualClock _ ManualClock new setTo: DateAndTime now.
 	
-	facade _ TusLibrosFacade
-		with: testObjectsFactory defaultUserDatabase
-		acceptingItemsFrom: testObjectsFactory defaultCatalog
-		chargingThrough: self
-		watchingTimeOn: manualClock.
+	facade _ testObjectsFactory defaultInterfaceChargingThrough: self watchingTimeOn: manualClock.
 		
 	username _ testObjectsFactory validUsername.
 	password _ testObjectsFactory validPassword.
@@ -1047,6 +1036,17 @@ defaultInterfaceChargingThrough: aMerchantProcessor
 		acceptingItemsFrom: self defaultCatalog
 		chargingThrough: aMerchantProcessor
 		watchingTimeOn: self defaultClock.! !
+
+!StoreTestObjectsFactory methodsFor: 'interface' stamp: 'AD 6/18/2018 15:03:07'!
+defaultInterfaceChargingThrough: aMerchantProcessor watchingTimeOn: manualClock
+
+		
+	^ TusLibrosFacade
+		with: self defaultUserDatabase
+		acceptingItemsFrom: self defaultCatalog
+		chargingThrough: aMerchantProcessor
+		watchingTimeOn: manualClock.
+		! !
 
 
 !StoreTestObjectsFactory methodsFor: 'clock' stamp: 'AD 6/18/2018 14:36:33'!
